@@ -47,22 +47,71 @@ def upload_to_s3(s3_bucket, files):
         data = open(f, 'rb')
         s3.Bucket(s3_bucket).put_object(Key=os.path.basename(f), Body=data)
 
-def get_s3_keys(s3_bucket):
-    """Get a list of keys in an S3 bucket.
+def get_s3_keys(s3_bucket, prefix=None):
+    """Get a list of keys in an S3 bucket. Optionally specify a prefix to
+    narrow down the keys returned.
 
     Args:
         s3_bucket (str): Name of the S3 bucket.
-
+        prefix (str, optional): File prefix. Defaults to None.
     Returns:
         keys (list): List of keys in the S3 bucket.
     """
     keys = []
     s3 = boto3.client('s3')
-    resp = s3.list_objects_v2(Bucket=s3_bucket)
-    for obj in resp['Contents']:
-        keys.append(obj['Key'])
+
+    paginator = s3.get_paginator('list_objects_v2')
+    filters = {'Bucket': s3_bucket}
+    if prefix is not None:
+        filters['Prefix'] = prefix
+    page_iterator = paginator.paginate(**filters)
+
+    for page in page_iterator:
+        for obj in page['Contents']:
+            keys.append(obj['Key'])
     return keys
 
+def read_s3_file(s3_bucket, key):
+    """Read the contents of an S3 object.
+
+    Args:
+        s3_bucket (str): Name of the S3 bucket.
+        key (str): Name of the S3 object
+
+    Returns:
+        contents (str): Contents of S3 object
+    """
+    log.info("Reading {0} from S3 bucket: {1}".format(key, s3_bucket))
+    s3 = boto3.resource('s3')
+    obj = s3.Object(s3_bucket, key)
+    contents = obj.get()['Body'].read().decode('utf-8')
+    return contents
+
+def parse_s3_contents(contents, delimiter, remove_dupes=False,
+                        skip_first_line=False):
+    """Read the contents of an S3 object into a list of lists.
+
+    Args:
+        contents (str): contents of an S3 object
+        delimiter (str): delimiter to split the contents of each line with
+        remove_dupes (bool, optional): ensure each line is unique. Defaults to
+            False.
+        skip_first_line (bool, optional): skip the first line of the S3 object.
+            Defaults to False.
+
+    Returns:
+        parsed_contents (list): List of lists, where each tuple is the contents
+            of a single line.
+    """
+    lines = [line for line in contents.split('\r\n') if line != '']
+    if remove_dupes:
+        lines = list(set(lines))
+        print (lines)
+    parsed_contents = [line.split(delimiter) for line in lines]
+    if skip_first_line:
+        parsed_contents = parsed_contents[1:]
+        
+    return parsed_contents
 
 def search_path(path, prefix=None, filetypes=[]):
     """Search a path and return all the files. Optionally specify file prefixes
@@ -70,7 +119,7 @@ def search_path(path, prefix=None, filetypes=[]):
 
     Args:
         path (str): input path
-        prefix (str, optional): File prefix
+        prefix (str, optional): File prefix. Defaults to None.
         filetypes (list, optional): List of file types to search for
             (i.e. ['.xls', '.xlsx', '.pdf'])
 
@@ -103,9 +152,10 @@ def clean_dir(path, prefix=None):
         path (str): input path
         prefix (str, optional): File prefix
     """
+
     log.info("Cleaning folders in %s" % path)
-    prefix_check = True
     for p in os.listdir(path):
+        prefix_check = True
         fullPath = os.path.join(path, p)
         if os.path.isdir(fullPath):
             shutil.rmtree(fullPath)
