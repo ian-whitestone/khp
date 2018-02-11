@@ -6,9 +6,73 @@ import logging
 import yaml
 import os
 import boto3
-
+import pytz
+import dateutil.parser
+from datetime import datetime, timedelta, date
 
 log = logging.getLogger(__name__)
+
+def yesterdays_range():
+    """Generate yesterdays date range, in datetime objects
+
+    Returns:
+        dt1 (datetime.datetime): Beginning of yesterday
+        dt2 (datetime.datetime): End of yesterday
+    """
+    dt1 = datetime.now() - timedelta(1)
+    dt1 = dt1.replace(hour=0, minute=0, second=0, microsecond=0)
+    dt2 = dt1 + timedelta(hours=23, minutes=59, seconds=59, milliseconds=999)
+    log.info("Yesterday's range start: {} end: {}".format(dt1, dt2))
+    return dt1, dt2
+
+def check_request(request):
+    """Check the status of a request
+    """
+    # TODO: implement
+    return
+
+def parse_date(str_dt):
+    """Convert a date string to a datetime object
+
+    Args:
+        str_dt (str): Date in any format excepted by dateutil.parser. WARNING:
+            read the dateutil.parser docs before using to udnerstand default
+            behaviour (i.e. how str_dt's like `2018` or `2` are handled)
+
+    Returns:
+        dt (datetime.datetime): Datetime object
+    """
+    log.info("Parsing '{}' into datetime object".format(str_dt))
+    try:
+        return dateutil.parser.parse(str_dt)
+    except ValueError:
+        raise
+    except Exception:
+        log.error("Unable to parse str_dt due to error.")
+        raise
+
+def convert_timezone(dt, tz1, tz2):
+    """Convert a datetime object from one timezone to another timezone
+
+    Args:
+        dt (datetime.datime): Datetime object to convert
+        tz1 (str): pytz acceptable timezone that dt is in
+        tz1 (str): pytz acceptable timezone to conver to
+
+    Returns:
+        dt2 (datetime.datetime): Datetime object in timezone 2
+    """
+    log.info("Converting '{}' from timezone: '{}' to timezone '{}'".format(
+                dt, tz1, tz2))
+    timezones = pytz.all_timezones
+    if tz1 not in timezones or tz2 not in timezones:
+        raise Exception("Supplied timezone(s) not in pytz available timezones. "
+                            "See pytz.all_timezones for available timezones")
+    zone1 = pytz.timezone(tz1)
+    zone2 = pytz.timezone(tz2)
+    dt1 = zone1.localize(dt) # not sure how to deal with `is_dst` dynamically..
+    dt2 = dt1.astimezone(zone2)
+    return dt2
 
 def read_yaml(yaml_file):
     """Read a yaml file.
@@ -110,7 +174,7 @@ def parse_s3_contents(contents, delimiter, remove_dupes=False,
     parsed_contents = [line.split(delimiter) for line in lines]
     if skip_first_line:
         parsed_contents = parsed_contents[1:]
-        
+
     return parsed_contents
 
 def search_path(path, prefix=None, filetypes=[]):

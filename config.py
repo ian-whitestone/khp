@@ -10,3 +10,8 @@ OUTPUT_DIR = os.path.join(CURR_DIR, 'output')
 
 # read in private.yml
 CONFIG = utils.read_yaml(CONFIG_PATH)
+
+# timezone of the system the program is running on
+SYS_TIMEZONE = "US/Eastern"
+# timezone of the Icescape API
+API_TIMEZONE = "UTC"
