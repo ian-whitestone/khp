@@ -9,21 +9,60 @@ import boto3
 import pytz
 import dateutil.parser
 from datetime import datetime, timedelta, date
+import json
+import pandas as pd
 
 log = logging.getLogger(__name__)
+
+def generate_date_range(start_date, end_date):
+    """Generate the range of dates between start_date and end_date
+
+    Args:
+        start_date (str): Start date, `YYYY-mm-dd`
+        end_date (str): End date, `YYYY-mm-dd`
+
+    Returns:
+        date_range (list): List of dates, as datetime.datetime objects, between
+            start_date and end_date
+    """
+    pandas_range = list(pd.date_range(start_date, end_date))
+    return [dt.to_pydatetime() for dt in pandas_range]
+
+def read_jason(filename):
+    """Read a json file into a python object
+
+    Args:
+        filename (str): path of the file
+
+    Returns:
+        data (list or dict): parsed data from the file
+    """
+    with open(filename, "r") as f:
+        content = f.read()
+    return json.loads(content)
+def write_jason(data, filename):
+    """Write a Python list or dictionary to a json file.
+
+    Args:
+        data (list or dict): data to write to file
+        filename (str): path of the file to write to
+    """
+    log.info("Writing data as json to {}".format(filename))
+    with open(filename, 'w') as outfile:
+        json.dump(data, outfile)
 
 def yesterdays_range():
     """Generate yesterdays date range, in datetime objects
 
     Returns:
-        dt1 (datetime.datetime): Beginning of yesterday
-        dt2 (datetime.datetime): End of yesterday
+        start (datetime.datetime): Beginning of yesterday
+        end (datetime.datetime): End of yesterday
     """
-    dt1 = datetime.now() - timedelta(1)
-    dt1 = dt1.replace(hour=0, minute=0, second=0, microsecond=0)
-    dt2 = dt1 + timedelta(hours=23, minutes=59, seconds=59, milliseconds=999)
-    log.info("Yesterday's range start: {} end: {}".format(dt1, dt2))
-    return dt1, dt2
+    now = datetime.now() - timedelta(1)
+    start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    end = start + timedelta(hours=23, minutes=59, seconds=59, milliseconds=999)
+    log.info("Yesterday's range start: {} end: {}".format(start, end))
+    return start, end
 
 def check_response(response):
     """Check the status of a requests response. If the status code is not 200,

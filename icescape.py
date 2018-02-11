@@ -80,10 +80,11 @@ class Icescape():
         dt2 = utils.convert_timezone(dt2, tz1, tz2)
         return dt1.strftime(dt_format), dt2.strftime(dt_format)
 
-    def get_contacts(self, start_time=None, end_time=None):
+    def get_contacts(self, interaction_type, start_time=None, end_time=None):
         """Get results from the Icescape QueryContacts2 API.
 
         Args:
+            interaction_type (str): Type of contact (i.e. IM, Voice, Email)
             start_time (str, optional): Start time, accepts date formats
                 `YYYY-mm-dd` or `YYYY-mm-dd H:M:S`. Defaults to beginning of
                 yesterday.
@@ -97,15 +98,16 @@ class Icescape():
         start_time, end_time = self._generate_dates(start_time, end_time)
 
         params = {
-            'interactionTypes': 'IM',
+            'interactionTypes': interaction_type,
             'maxResults': 1000,
             'startTime': start_time,
             'endTime': end_time,
             'includeAdditionalData': True
         }
         base_url = "https://iceimr16.icescape.com:8189/webapi/QueryContacts2?"
+        log.info("Requesting {} with params:\n{}".format(base_url, params))
         r = requests.get(base_url, params=params, headers=self.headers)
-        log.info("Requested: {}".format(r.url))
+        log.debug("Requested: {}".format(r.url))
         utils.check_response(r)
         data = r.json()
         return data
