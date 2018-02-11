@@ -39,7 +39,7 @@ def download(folder, output_dir):
             words = ftp_file.split(None, 8)
             filename = words[-1].lstrip()
             log.debug("Writing file %s" % filename)
-            output_file = os.path.join(config.OUTPUT_DIR, filename)
+            output_file = os.path.join(output_dir, filename)
             with open(output_file, "wb") as f:
                 ftp.retrbinary("RETR " + filename, f.write, 8*1024)
 
@@ -55,9 +55,9 @@ def load_to_s3(prefix=None):
     s3_bucket = S3_BUCKET
     keys = utils.get_s3_keys(s3_bucket)
     # get all files from output dir that is not in keys
-    files = utils.search_path(config.OUTPUT_DIR, prefix=prefix)
+    files = utils.search_path(config.FTP_OUTPUT_DIR, prefix=prefix)
     basenames = [os.path.basename(f) for f in files]
-    unloaded_files = [os.path.join(config.OUTPUT_DIR, f)
+    unloaded_files = [os.path.join(config.FTP_OUTPUT_DIR, f)
                         for f in list(set(basenames) - set(keys))]
 
     if len(unloaded_files) > 0:
@@ -65,7 +65,7 @@ def load_to_s3(prefix=None):
     else:
         log.warning("No files to upload")
 
-    utils.clean_dir(config.OUTPUT_DIR, prefix=prefix)
+    utils.clean_dir(config.FTP_OUTPUT_DIR, prefix=prefix)
 
 #TODO: Refactor report loading into a class!
 def load_ftci_to_postgres():
@@ -108,11 +108,11 @@ def load_ftci_to_postgres():
             load.load_from_object(table_name='loaded_reports', data=load_data)
 
 ## Run every 10 minutes
-# download('CSI_files', config.OUTPUT_DIR)
+# download('CSI_files', config.FTP_OUTPUT_DIR)
 # load_to_s3("V1")
 
 ## Run twice a day
-# download('FTCI_files/Archive', config.OUTPUT_DIR)
+download('FTCI_files/Archive', config.FTP_OUTPUT_DIR)
 # load_to_s3("V2")
 
 # load_ftci_to_postgres()
