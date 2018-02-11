@@ -2,6 +2,7 @@ import logging
 import requests
 import config
 import utils
+import json
 
 log = logging.getLogger(__name__)
 
@@ -22,14 +23,9 @@ class Icescape():
         log.info("Getting access token")
         r = requests.post(base_url, params={'userID': self.user,
                                                 'password': self.password})
-        if r.status_code == 200:
-            response = r.json()
-            token = response['AccessToken']
-        else:
-            logger.error("Requests error code: {0}. Response:\n{1}".format(
-                r.status_code, r.text))
-            raise Exception("Unable to get contacts")
-
+        utils.check_response(r)
+        data = r.json()
+        token = data['AccessToken']
         return token
 
     def _build_headers(self):
@@ -109,11 +105,23 @@ class Icescape():
         }
         base_url = "https://iceimr16.icescape.com:8189/webapi/QueryContacts2?"
         r = requests.get(base_url, params=params, headers=self.headers)
-        log.info("Requesting: {}".format(r.url))
-        if r.status_code == 200:
-            data = r.json()
-        else:
-            logger.error("Requests error code: {0}. Response:\n{1}".format(
-                r.status_code, r.text))
-            raise Exception("Unable to get contacts")
+        log.info("Requested: {}".format(r.url))
+        utils.check_response(r)
+        data = r.json()
+        return data
+
+    def get_recordings(self, contact_ids):
+        """Get the results from the Icescape GetRecordings API.
+
+        Args:
+            contact_ids (list): List of Contact IDs to retrieve recordings for
+        Returns:
+            data (list): Array of contact data dictionaries
+        """
+        base_url = "https://iceimr16.icescape.com:8189/webapi/GetRecordings"
+        payload = ["C:{}".format(contact_id) for contact_id in contact_ids]
+        r = requests.post(base_url, data=json.dumps(payload),
+                            headers=self.headers)
+        utils.check_response(r)
+        data = r.json()
         return data

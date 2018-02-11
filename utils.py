@@ -25,10 +25,23 @@ def yesterdays_range():
     log.info("Yesterday's range start: {} end: {}".format(dt1, dt2))
     return dt1, dt2
 
-def check_request(request):
-    """Check the status of a request
+def check_response(response):
+    """Check the status of a requests response. If the status code is not 200,
+    log the error and raise an exception.
+
+    Args:
+        response (requests.models.Response): Requests response object
+
+    Raises
+        Exception: If the status code is not 200
     """
     # TODO: implement
+    if response.status_code == 200:
+        return
+    else:
+        log.error("Requests error code: {0}. Response:\n{1}".format(
+            response.status_code, response.text))
+        raise Exception("Non-200 status code returned")
     return
 
 def parse_date(str_dt):
