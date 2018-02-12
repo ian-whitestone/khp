@@ -69,8 +69,8 @@ class Icescape():
         dt_format = '%Y-%m-%dT%H:%M:%S.%fZ'
 
         if start_time is not None and end_time is not None:
-            dt1 = parse_date(start_time)
-            dt2 = parse_date(end_time)
+            dt1 = utils.parse_date(start_time)
+            dt2 = utils.parse_date(end_time)
         else:
             dt1, dt2 = utils.yesterdays_range()
             log.info("Both start_time and end_time were not provided, "
@@ -99,7 +99,7 @@ class Icescape():
 
         params = {
             'interactionTypes': interaction_type,
-            'maxResults': 1000,
+            'maxResults': config.MAX_RESULTS,
             'startTime': start_time,
             'endTime': end_time,
             'includeAdditionalData': True
@@ -122,6 +122,7 @@ class Icescape():
         """
         base_url = "https://iceimr16.icescape.com:8189/webapi/GetRecordings"
         payload = ["C:{}".format(contact_id) for contact_id in contact_ids]
+        log.info("Requesting {} with payload: {}".format(base_url, payload))
         r = requests.post(base_url, data=json.dumps(payload),
                             headers=self.headers)
         utils.check_response(r)
