@@ -13,7 +13,8 @@ CREATE TABLE ftci (
   evt_cd_1 INTEGER,
   evt_cd_2 INTEGER,
   dt TIMESTAMP,
-  PRIMARY KEY (agent_id, evt_cd_1, evt_cd_2, dt)
+  PRIMARY KEY (agent_id,
+    evt_cd_1, evt_cd_2, dt)
 )
 ;
 
@@ -36,3 +37,22 @@ CREATE TABLE csi (
 
 CREATE INDEX csi_queue_id ON csi USING (queue_id);
 CREATE INDEX csi_dt ON csi USING (dt);
+
+
+CREATE TABLE contacts (
+  contact_id INTEGER,
+  queue_id INTEGER,
+  interaction_type VARCHAR(5),
+  start_time TIMESTAMP,
+  end_time TIMESTAMP,
+  contact_group_id INTEGER,
+  agent_id INTEGER,
+  secondary_agents TEXT,
+  recording_identifier VARCHAR(15),
+  contact_state INTEGER,
+  sender VARCHAR(150),
+  receiver VARCHAR(150),
+  contact_group_name VARCHAR(15),
+  PRIMARY KEY (contact_id, interaction_type)
+)
+;

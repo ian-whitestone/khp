@@ -1,10 +1,12 @@
-import config
-import os
-import utils
-from icescape import Icescape
-from transforms import Transformer
 import logging
 from datetime import timedelta, datetime
+import os
+
+import postgrez
+import utils
+import config
+from icescape import Icescape
+from transforms import Transformer
 
 FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 logging.basicConfig(level=logging.DEBUG, format=FORMAT)
@@ -13,6 +15,8 @@ log = logging.getLogger(__name__)
 logging.getLogger("botocore").setLevel(logging.WARNING)
 logging.getLogger("boto3").setLevel(logging.WARNING)
 logging.getLogger("requests").setLevel(logging.INFO)
+
+CONF = config.CONFIG
 
 def save_data(data, filename, s3=False):
     """Save data from icescape API.
@@ -78,20 +82,32 @@ def download_transcripts(contact_ids):
 
 
 def parse_contacts_file(filename):
+    db_conf = CONF['database']
+    base_file = os.path.basename(filename)
+    interaction_type = base_file.split('_')[0]
+
     contacts = utils.read_jason(filename)
     transforms_meta = config.TRANSFORMS["contacts"]
     optimus = Transformer(transforms_meta)
 
+    parsed_contacts = []
     for contact in contacts:
         contact_data = optimus.run_transforms(contact)
-        print (contact_data)
-        break
+        contact_data['interaction_type'] = interaction_type
+        parsed_contacts.append(contact_data)
+
+    columns = list(parsed_contacts[0].keys())
+    load_data = [[contact_data[key] for key in columns]
+                    for contact_data in parsed_contacts]
+    postgrez.load(table_name="contacts", data=load_data, columns=columns,
+                host=db_conf['host'], user=db_conf['user'],
+                password=db_conf['pwd'], database=db_conf['db'])
 
 
-download_contacts("IM", "2017-09-01", "2018-02-10")
+# download_contacts("IM", "2017-09-01", "2018-02-10")
 # download_transcripts([197621])
 
-# parse_contacts_file("output/icescape/2018-02-10_contacts.txt")
+parse_contacts_file("output/icescape/IM_2017-09-01_contacts.txt")
 # transcript = utils.read_jason("output/icescape/197621_data.txt")
 
 

@@ -78,3 +78,5 @@ class Transformer():
                 transformed[items["name"]] = value
 
         return transformed
+
+#TODO: add logging
