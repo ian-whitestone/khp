@@ -1,0 +1,44 @@
+contacts:
+  - HandledQueueID|Value:
+      name: queue_id
+      type: int
+  - StartTime|Value:
+      name: start_time
+      type: str
+  - EndTime|Value:
+      name: end_time
+      type: str
+  - OriginatorAddress|Value:
+      name: sender
+      type: str
+  - ReceivingAddress|Value:
+      name: receiver
+      type: str
+  - ContactGroupID|Value:
+      name: contact_group_id
+      type:  int
+  - ContactID|Value:
+      name: contact_id
+      type: int
+  - HandlingUserIDs|Value:
+      name: handlers
+      type: list
+      transform: parse_handlers
+  - ContactGroupName|Value:
+      name: contact_group_name
+      type: str
+  - State|Value:
+      name: contact_state
+      type: int
+  - RecordingRetreivalIdentifier:
+      name: recording_identifier
+      type: str
+
+recording:
+  - Value|ContactID:
+      name: contact_id
+      type: int
+  - Value|IMMessages|Value:
+      name: message
+      type: list
+      transform: parse_messages
