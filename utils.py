@@ -12,7 +12,7 @@ from datetime import datetime, timedelta, date
 import json
 import pandas as pd
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 def generate_date_range(start_date, end_date):
     """Generate the range of dates between start_date and end_date
@@ -39,6 +39,7 @@ def read_jason(filename):
     """
     with open(filename, "r") as f:
         content = f.read()
+
     return json.loads(content)
 def write_jason(data, filename):
     """Write a Python list or dictionary to a json file.
@@ -47,7 +48,7 @@ def write_jason(data, filename):
         data (list or dict): data to write to file
         filename (str): path of the file to write to
     """
-    log.info("Writing data as json to {}".format(filename))
+    LOG.info("Writing data as json to {}".format(filename))
     with open(filename, 'w') as outfile:
         json.dump(data, outfile)
 
@@ -61,7 +62,7 @@ def yesterdays_range():
     now = datetime.now() - timedelta(1)
     start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     end = start + timedelta(hours=23, minutes=59, seconds=59, milliseconds=999)
-    log.info("Yesterday's range start: {} end: {}".format(start, end))
+    LOG.info("Yesterday's range start: {} end: {}".format(start, end))
     return start, end
 
 def check_response(response):
@@ -78,7 +79,7 @@ def check_response(response):
     if response.status_code == 200:
         return
     else:
-        log.error("Requests error code: {0}. Response:\n{1}".format(
+        LOG.error("Requests error code: {0}. Response:\n{1}".format(
             response.status_code, response.text))
         raise Exception("Non-200 status code returned")
     return
@@ -94,13 +95,13 @@ def parse_date(str_dt):
     Returns:
         dt (datetime.datetime): Datetime object
     """
-    log.info("Parsing '{}' into datetime object".format(str_dt))
+    LOG.info("Parsing '{}' into datetime object".format(str_dt))
     try:
         return dateutil.parser.parse(str_dt)
     except ValueError:
         raise
     except Exception:
-        log.error("Unable to parse str_dt due to error.")
+        LOG.error("Unable to parse str_dt due to error.")
         raise
 
 def convert_timezone(dt, tz1, tz2):
@@ -114,7 +115,7 @@ def convert_timezone(dt, tz1, tz2):
     Returns:
         dt2 (datetime.datetime): Datetime object in timezone 2
     """
-    log.info("Converting '{}' from timezone: '{}' to timezone '{}'".format(
+    LOG.info("Converting '{}' from timezone: '{}' to timezone '{}'".format(
                 dt, tz1, tz2))
     timezones = pytz.all_timezones
     if tz1 not in timezones or tz2 not in timezones:
@@ -140,28 +141,34 @@ def read_yaml(yaml_file):
     """
 
     try:
-        log.debug("Reading in yaml file %s" % yaml_file)
+        LOG.debug("Reading in yaml file %s" % yaml_file)
         with open(yaml_file) as f:
             # use safe_load instead load
             data = yaml.safe_load(f)
         return data
     except Exception as e:
-        log.error('Unable to read file %s. Error: %s' % (yaml_file,e))
+        LOG.error('Unable to read file %s. Error: %s' % (yaml_file,e))
         raise
 
-def upload_to_s3(s3_bucket, files):
+def upload_to_s3(s3_bucket, files, encrypt=True):
     """Upload a list of files to S3.
 
     Args:
         s3_bucket (str): Name of the S3 bucket.
         files (list): List of files to upload
+        encrypt (bool, optional): Use serverside AES256 encryption, defaults to
+            True.
     """
-    log.info("Attempting to load {0} files to s3 bucket: {1}".format(
-                len(files), s3_bucket))
+    LOG.info("Attempting to load {0} files to s3 bucket: {1}".format(
+             len(files), s3_bucket))
     s3 = boto3.resource('s3')
     for f in files:
         data = open(f, 'rb')
-        s3.Bucket(s3_bucket).put_object(Key=os.path.basename(f), Body=data)
+        if encrypt:
+            s3.Bucket(s3_bucket).put_object(Key=os.path.basename(f), Body=data,
+                                            ServerSideEncryption='AES256')
+        else:
+            s3.Bucket(s3_bucket).put_object(Key=os.path.basename(f), Body=data)
 
 def get_s3_keys(s3_bucket, prefix=None):
     """Get a list of keys in an S3 bucket. Optionally specify a prefix to
@@ -197,7 +204,7 @@ def read_s3_file(s3_bucket, key):
     Returns:
         contents (str): Contents of S3 object
     """
-    log.info("Reading {0} from S3 bucket: {1}".format(key, s3_bucket))
+    LOG.info("Reading {0} from S3 bucket: {1}".format(key, s3_bucket))
     s3 = boto3.resource('s3')
     obj = s3.Object(s3_bucket, key)
     contents = obj.get()['Body'].read().decode('utf-8')
@@ -243,7 +250,7 @@ def search_path(path, prefix=None, filetypes=[]):
         files (list): list of files matching the specified filetypes
     """
     files = []
-    log.info('Searching for files in %s' % path)
+    LOG.info('Searching for files in %s' % path)
     for p in os.listdir(path):
         fullPath = os.path.join(path, p)
 
@@ -257,7 +264,7 @@ def search_path(path, prefix=None, filetypes=[]):
                 prefix_check = basename.startswith(prefix)
             if type_check and prefix_check:
                 files.append(fullPath)
-    log.info("Found {0} files in {1} matching prefix '{2}' and filetypes {3}"
+    LOG.info("Found {0} files in {1} matching prefix '{2}' and filetypes {3}"
                 .format(len(files), path, prefix, filetypes))
     return files
 
@@ -269,7 +276,7 @@ def clean_dir(path, prefix=None):
         prefix (str, optional): File prefix
     """
 
-    log.info("Cleaning folders in %s" % path)
+    LOG.info("Cleaning folders in %s" % path)
     for p in os.listdir(path):
         prefix_check = True
         fullPath = os.path.join(path, p)
