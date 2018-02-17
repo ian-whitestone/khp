@@ -7,7 +7,14 @@ import json
 log = logging.getLogger(__name__)
 
 class Icescape():
-    """
+    """Summary
+
+    Attributes:
+        headers (TYPE): Description
+        password (TYPE): Description
+        token (TYPE): Description
+        user (TYPE): Description
+        user_agent (TYPE): Description
     """
 
     def __init__(self):
@@ -128,3 +135,4 @@ class Icescape():
         utils.check_response(r)
         data = r.json()
         return data
+

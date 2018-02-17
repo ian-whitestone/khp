@@ -34,11 +34,8 @@ contacts:
       name: recording_identifier
       type: str
 
-recording:
-  - Value|ContactID:
-      name: contact_id
-      type: int
+transcript:
   - Value|IMMessages|Value:
-      name: message
+      name: messages
       type: list
       transform: parse_messages
