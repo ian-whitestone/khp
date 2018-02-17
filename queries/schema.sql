@@ -56,3 +56,14 @@ CREATE TABLE contacts (
   PRIMARY KEY (contact_id, interaction_type)
 )
 ;
+
+CREATE TABLE transcripts (
+  contact_id INTEGER,
+  sender VARCHAR(150),
+  display_name VARCHAR(100),
+  dt TIMESTAMP,
+  message_type INTEGER,
+  message TEXT,
+  PRIMARY KEY (contact_id, dt, message)
+)
+;
