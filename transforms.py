@@ -15,11 +15,16 @@ def parse_handlers(handlers):
         output (dict): Dictionary containing primary and secondary handlers
     """
     output = {}
-    output["agent_id"] = handlers[0]
-    if len(handlers) == 1:
+    if not handlers: # no handlers on the call
+        output['agent_id'] = None
+        output['secondary_agents'] = None
+    elif len(handlers) == 1: # 1 handler
+        output["agent_id"] = handlers[0]
         output["secondary_agents"] = None
-    else:
+    else: # more than 2 handlers
+        output["agent_id"] = handlers[0]
         output["secondary_agents"] = ",".join(handlers[1:])
+
     return output
 
 def parse_html(html):
