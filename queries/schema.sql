@@ -50,16 +50,18 @@ CREATE TABLE contacts (
   secondary_agents TEXT,
   recording_identifier VARCHAR(15),
   contact_state INTEGER,
-  sender VARCHAR(150),
-  receiver VARCHAR(150),
+  sender text,
+  receiver text,
   contact_group_name VARCHAR(15),
+  transcript_downloaded BOOLEAN,
+  load_file VARCHAR(100),
   PRIMARY KEY (contact_id, interaction_type)
 )
 ;
 
 CREATE TABLE transcripts (
   contact_id INTEGER,
-  sender VARCHAR(150),
+  sender text,
   display_name VARCHAR(100),
   dt TIMESTAMP,
   message_type INTEGER,
