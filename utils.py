@@ -7,6 +7,8 @@ import yaml
 import os
 import boto3
 import pytz
+import re
+
 import dateutil.parser
 from datetime import datetime, timedelta, date
 import json
@@ -59,8 +61,8 @@ def yesterdays_range():
         start (datetime.datetime): Beginning of yesterday
         end (datetime.datetime): End of yesterday
     """
-    now = datetime.now() - timedelta(1)
-    start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    yesterday = datetime.now() - timedelta(1)
+    start = yesterday.replace(hour=0, minute=0, second=0, microsecond=0)
     end = start + timedelta(hours=23, minutes=59, seconds=59, milliseconds=999)
     LOG.info("Yesterday's range start: {} end: {}".format(start, end))
     return start, end
@@ -146,8 +148,8 @@ def read_yaml(yaml_file):
             # use safe_load instead load
             data = yaml.safe_load(f)
         return data
-    except Exception as e:
-        LOG.error('Unable to read file %s. Error: %s' % (yaml_file,e))
+    except Exception:
+        LOG.error('Unable to read file %s.' % (yaml_file))
         raise
 
 def upload_to_s3(s3_bucket, files, encrypt=True):
@@ -236,15 +238,13 @@ def parse_s3_contents(contents, delimiter, remove_dupes=False,
 
     return parsed_contents
 
-def search_path(path, prefix=None, filetypes=[]):
+def search_path(path, like=None):
     """Search a path and return all the files. Optionally specify file prefixes
     and/or filetypes to narrow your criteria.
 
     Args:
         path (str): input path
-        prefix (str, optional): File prefix. Defaults to None.
-        filetypes (list, optional): List of file types to search for
-            (i.e. ['.xls', '.xlsx', '.pdf'])
+        like (list, optional): List of file regexes to match files on
 
     Returns:
         files (list): list of files matching the specified filetypes
@@ -252,20 +252,18 @@ def search_path(path, prefix=None, filetypes=[]):
     files = []
     LOG.info('Searching for files in %s' % path)
     for p in os.listdir(path):
-        fullPath = os.path.join(path, p)
+        full_path = os.path.join(path, p)
 
-        type_check = True
-        prefix_check = True
-        if os.path.isfile(fullPath):
-            basename = os.path.basename(fullPath)
-            if filetypes:
-                type_check = fullPath.endswith(tuple(filetypes))
-            if prefix:
-                prefix_check = basename.startswith(prefix)
-            if type_check and prefix_check:
-                files.append(fullPath)
-    LOG.info("Found {0} files in {1} matching prefix '{2}' and filetypes {3}"
-                .format(len(files), path, prefix, filetypes))
+        if os.path.isfile(full_path):
+            basename = os.path.basename(full_path)
+            if like:
+                matches = [(True if re.search(reg, basename) else False)
+                           for reg in like]
+                if sum(matches) > 0:
+                    files.append(full_path)
+            else:
+                files.append(full_path)
+    LOG.info("Found %s files in %s", len(files), path)
     return files
 
 def clean_dir(path, prefix=None):
