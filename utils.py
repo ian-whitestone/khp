@@ -16,6 +16,19 @@ import pandas as pd
 
 LOG = logging.getLogger(__name__)
 
+def chunker(seq, chunk_size):
+    """Break a list into a set of smaller lists with len = chunk_size
+
+    Args:
+        seq (list): list to split up into chunks
+        chunk_size (int): size of chunks
+
+    Returns:
+        list: list of lists with len = chunk_size
+    """
+    return (seq[pos:pos + chunk_size] for pos in
+            range(0, len(seq), chunk_size))
+
 def generate_date_range(start_date, end_date):
     """Generate the range of dates between start_date and end_date
 

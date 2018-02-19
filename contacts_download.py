@@ -17,7 +17,7 @@ logging.getLogger("boto3").setLevel(logging.WARNING)
 logging.getLogger("requests").setLevel(logging.INFO)
 
 CONF = config.CONFIG
-db_conf = CONF['database']
+DB_CONF = CONF['database']
 
 def save_data(data, filename):
     """Save data from icescape API.
@@ -68,14 +68,14 @@ def download_transcripts(contact_ids=None):
             for. If None are provided (default), queries contacts that have not
             been parsed
     """
-    db_conf = CONF['database']
     if contact_ids is None:
         query = """
             SELECT contact_id FROM contacts WHERE transcript_downloaded=FALSE
+            AND agent_id IS NOT NULL
             """
-        data = postgrez.execute(query=query, host=db_conf['host'],
-                                user=db_conf['user'], password=db_conf['pwd'],
-                                database=db_conf['db'])
+        data = postgrez.execute(query=query, host=DB_CONF['host'],
+                                user=DB_CONF['user'], password=DB_CONF['pwd'],
+                                database=DB_CONF['db'])
         contact_ids = [record['contact_id'] for record in data]
 
     if not contact_ids:
@@ -83,27 +83,33 @@ def download_transcripts(contact_ids=None):
         return
 
     ice = Icescape()
-    transcripts = ice.get_recordings(contact_ids)
-    if len(transcripts) != len(contact_ids):
-        raise Exception("Transcripts not returned for all contact ids")
-    for contact_id, transcript in zip(contact_ids, transcripts):
-        filename = "{}_data.txt".format(contact_id)
-        save_data(transcript, filename)
+    for chunked_contact_ids in utils.chunker(contact_ids[0:1000], 20):
+        transcripts = ice.get_recordings(chunked_contact_ids)
+        if len(transcripts) != len(chunked_contact_ids):
+            missing = list(set(chunked_contact_ids) - set(transcripts))
+            LOG.warning('Missing transcripts %s', missing)
+            raise Exception("Transcripts not returned for all contact ids")
+        for contact_id, transcript in zip(chunked_contact_ids, transcripts):
+            filename = "{}_data.txt".format(contact_id)
+            save_data(transcript, filename)
 
-    update_query = """
-        UPDATE contacts SET transcript_downloaded=TRUE WHERE contact_id IN ({})
-        """.format(','.join([str(id) for id in contact_ids]))
-    postgrez.execute(query=update_query, host=db_conf['host'],
-                     user=db_conf['user'], password=db_conf['pwd'],
-                     database=db_conf['db'])
+        update_query = """
+            UPDATE contacts SET transcript_downloaded=TRUE
+            WHERE contact_id IN ({})
+            """.format(','.join([str(id) for id in chunked_contact_ids]))
+        postgrez.execute(query=update_query, host=DB_CONF['host'],
+                         user=DB_CONF['user'], password=DB_CONF['pwd'],
+                         database=DB_CONF['db'])
 
 def parse_contacts_file(filename):
     LOG.info("Parsing contact file %s", filename)
-    db_conf = CONF['database']
     base_file = os.path.basename(filename)
     interaction_type = base_file.split('_')[0]
 
     contacts = utils.read_jason(filename)
+    if not contacts:
+        LOG.warning("Empty contacts file. Exiting..")
+        return
     transforms_meta = config.TRANSFORMS["contacts"]
     optimus = Transformer(transforms_meta)
 
@@ -119,12 +125,12 @@ def parse_contacts_file(filename):
     load_data = [[contact_data[key] for key in columns]
                  for contact_data in parsed_contacts]
     postgrez.load(table_name="contacts", data=load_data, columns=columns,
-                  host=db_conf['host'], user=db_conf['user'],
-                  password=db_conf['pwd'], database=db_conf['db'])
+                  host=DB_CONF['host'], user=DB_CONF['user'],
+                  password=DB_CONF['pwd'], database=DB_CONF['db'])
 
 def parse_transcript(filename):
     LOG.info("Parsing transcript file %s", filename)
-    db_conf = CONF['database']
+
 
     transcript = utils.read_jason(filename)
     transforms_meta = config.TRANSFORMS["transcript"]
@@ -137,8 +143,8 @@ def parse_transcript(filename):
                  for message in messages]
 
     postgrez.load(table_name="transcripts", data=load_data, columns=columns,
-                  host=db_conf['host'], user=db_conf['user'],
-                  password=db_conf['pwd'], database=db_conf['db'])
+                  host=DB_CONF['host'], user=DB_CONF['user'],
+                  password=DB_CONF['pwd'], database=DB_CONF['db'])
     return
 
 
@@ -147,12 +153,12 @@ def get_contacts_to_load():
     Postgres.
 
     Returns:
-        list: List of contact files to load
+        list: List of contact filenames to load
     """
-    contacts_reg = r"\w*_\d{4}-\d{1,2}-\d{1,2}_\w*"
+    contacts_reg = r"^\w*_\d{4}-\d{1,2}-\d{1,2}_\w*"
     query = "SELECT load_file FROM contacts GROUP BY 1"
-    data = postgrez.execute(query, host=db_conf['host'], user=db_conf['user'],
-                            password=db_conf['pwd'], database=db_conf['db'])
+    data = postgrez.execute(query, host=DB_CONF['host'], user=DB_CONF['user'],
+                            password=DB_CONF['pwd'], database=DB_CONF['db'])
     loaded_files = [record['load_file'] for record in data]
     files = utils.search_path(config.ICESCAPE_OUTPUT_DIR, [contacts_reg])
     filenames = [os.path.basename(file) for file in files]
@@ -166,13 +172,23 @@ def get_transcripts_to_load():
     Returns:
         list: List of trancsript files to load
     """
+    transcripts_reg = r"^\d*_data.txt"
     query = "SELECT contact_id FROM transcripts GROUP BY 1"
-    data = postgrez.execute(query, host=db_conf['host'], user=db_conf['user'],
-                            password=db_conf['pwd'], database=db_conf['db'])
-    data = [record['contact_id'] for record in data]
-    return
+    data = postgrez.execute(query, host=DB_CONF['host'], user=DB_CONF['user'],
+                            password=DB_CONF['pwd'], database=DB_CONF['db'])
+    loaded_contacts = [record['contact_id'] for record in data]
+    files = utils.search_path(config.ICESCAPE_OUTPUT_DIR, [transcripts_reg])
+    filenames = [os.path.basename(file) for file in files]
 
-def main(start_date=None, end_date=None):
+    to_load = []
+    for file in filenames:
+        basename = os.path.basename(file)
+        contact_id = basename.split('_data.txt')[0]
+        if contact_id not in loaded_contacts:
+            to_load.append(basename)
+    return to_load
+
+def main(interaction_type='IM', start_date=None, end_date=None):
     if start_date is None and end_date is None:
         yesterday = datetime.today() - timedelta(1)
         start_date = yesterday.strftime('%Y-%m-%d')
@@ -183,7 +199,7 @@ def main(start_date=None, end_date=None):
         return
 
     ## DOWNLOAD CONTACTS ##
-    download_contacts("IM", start_date, end_date)
+    download_contacts(interaction_type, start_date, end_date)
 
     ## CONTACTS LOADING ##
     contacts_to_load = get_contacts_to_load()
@@ -200,5 +216,6 @@ def main(start_date=None, end_date=None):
         parse_transcript(full_path)
 
 if __name__ == '__main__':
+    # main("IM", '2018-02-10', '2018-02-17')
     main()
 
