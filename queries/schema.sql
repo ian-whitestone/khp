@@ -65,7 +65,6 @@ CREATE TABLE transcripts (
   display_name VARCHAR(100),
   dt TIMESTAMP,
   message_type INTEGER,
-  message TEXT,
-  PRIMARY KEY (contact_id, dt, message)
+  message TEXT
 )
 ;
