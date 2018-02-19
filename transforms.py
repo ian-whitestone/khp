@@ -32,14 +32,22 @@ def parse_html(html):
     return soup.get_text()
 
 
+def clean_text(text):
+    ## replace newlines with spaces
+    text = ' '.join(text.split())
+    keep = [' ', '!', '?', '[', ']', '(', ')', '.', '$', '#', '*', ',', ':',
+            ';']
+    # get rid of everything that isn't a number, letter, or in keep
+    text = ''.join([char for char in text if char.isalnum() or char in keep])
+    return text
+
 def parse_message(message_text, is_html):
     if is_html:
         parsed_text = parse_html(message_text)
     else:
         parsed_text = message_text
 
-    # strip newlines
-    parsed_text = ' '.join(parsed_text.split())
+    parsed_text = clean_text(parsed_text)
     return parsed_text
 
 def parse_messages(messages):
