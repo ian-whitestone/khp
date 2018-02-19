@@ -1,0 +1,30 @@
+version: 1
+formatters:
+  simpleFormatter:
+    format: '%(asctime)s|%(levelname)s|%(name)s: %(message)s'
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: simpleFormatter
+    level: INFO
+  file:
+    class: logging.FileHandler
+    formatter: simpleFormatter
+    level: DEBUG
+    filename: khp.txt
+
+loggers:
+  postgrez:
+    level: DEBUG
+  khp:
+    level: DEBUG
+  botocore:
+    level: WARNING
+  boto3:
+    level: WARNING
+  requests:
+    level: INFO
+
+root:
+  handlers: [console, file]

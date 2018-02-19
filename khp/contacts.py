@@ -3,19 +3,12 @@ from datetime import timedelta, datetime
 import os
 
 import postgrez
-import utils
-import config
-from icescape import Icescape
-from transforms import Transformer
+from khp import utils
+from khp import config
+from khp.icescape import Icescape
+from khp.transforms import Transformer
 
-FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 LOG = logging.getLogger(__name__)
-
-logging.getLogger("botocore").setLevel(logging.WARNING)
-logging.getLogger("boto3").setLevel(logging.WARNING)
-logging.getLogger("requests").setLevel(logging.INFO)
-
 CONF = config.CONFIG
 DB_CONF = CONF['database']
 
@@ -50,8 +43,8 @@ def download_contacts(interaction_type, start_date=None, end_date=None):
             contact_data = ice.get_contacts(
                 interaction_type, start_time=start_dt.strftime(tm_format),
                 end_time=end_dt.strftime(tm_format))
-            filename = "{}_{}_contacts.txt".format(interaction_type,
-                            start_dt.strftime(dt_format))
+            filename = "{}_{}_contacts.txt".format(
+                interaction_type, start_dt.strftime(dt_format))
             save_data(contact_data, filename)
     else:
         contact_data = ice.get_contacts(interaction_type)
@@ -82,8 +75,9 @@ def download_transcripts(contact_ids=None):
         LOG.warning("No contact ids to parse. Exiting..")
         return
 
+    LOG.info("Attempting to process %s contact ids", len(contact_ids))
     ice = Icescape()
-    for chunked_contact_ids in utils.chunker(contact_ids[0:1000], 20):
+    for chunked_contact_ids in utils.chunker(contact_ids, 20):
         transcripts = ice.get_recordings(chunked_contact_ids)
         if len(transcripts) != len(chunked_contact_ids):
             missing = list(set(chunked_contact_ids) - set(transcripts))
@@ -218,4 +212,3 @@ def main(interaction_type='IM', start_date=None, end_date=None):
 if __name__ == '__main__':
     # main("IM", '2018-02-10', '2018-02-17')
     main()
-

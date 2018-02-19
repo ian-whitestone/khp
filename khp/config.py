@@ -1,12 +1,13 @@
 import logging
-import utils
+from khp import utils
 import os
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
-CURR_DIR = os.getcwd()
-CONFIG_PATH = os.path.join(CURR_DIR, 'private.yml')
-TRANSFORMS_PATH = os.path.join(CURR_DIR, 'transforms.yml')
+CURR_DIR = os.path.dirname(os.path.realpath(__file__))
+CONFIG_DIR = os.path.join(CURR_DIR, 'config')
+CONFIG_PATH = os.path.join(CONFIG_DIR, 'private.yml')
+TRANSFORMS_PATH = os.path.join(CONFIG_DIR, 'transforms.yml')
 FTP_OUTPUT_DIR = os.path.join(CURR_DIR, 'output', 'ftp')
 ICESCAPE_OUTPUT_DIR = os.path.join(CURR_DIR, 'output', 'icescape')
 

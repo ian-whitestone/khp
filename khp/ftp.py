@@ -1,17 +1,13 @@
+from datetime import datetime
+import os
 import logging
-FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-logging.basicConfig(level=logging.DEBUG, format=FORMAT)
-log = logging.getLogger(__name__)
-logging.getLogger("botocore").setLevel(logging.WARNING)
-logging.getLogger("boto3").setLevel(logging.WARNING)
 
 import postgrez
-import os
-import config
-import utils
-from ImplicitlyTLS import tyFTP
-from datetime import datetime
+from khp import config
+from khp import utils
+from khp.implicity_tls import tyFTP
 
+LOG = logging.getLogger(__name__)
 CONF = config.CONFIG
 S3_BUCKET = CONF['aws']['s3_bucket']
 
@@ -21,24 +17,24 @@ def download(folder, output_dir):
     Args:
         folder (str): folder to download files from
     """
-    log.info('Downloading files from FTP folder %s' % folder)
+    LOG.info('Downloading files from FTP folder %s', folder)
     ftp_conf = CONF['ftp']
     with tyFTP() as ftp:
-        log.debug("Connecting to host %s" % ftp_conf['host'])
+        LOG.debug("Connecting to host %s", ftp_conf['host'])
         ftp.connect(host=ftp_conf['host'].encode("ascii"),
                         port=ftp_conf['port'])
-        log.debug("Logging into host %s" % ftp_conf['host'])
+        LOG.debug("Logging into host %s", ftp_conf['host'])
         ftp.login(user=ftp_conf['user'], passwd=ftp_conf['pwd'])
-        log.debug("Switching to secure data connection")
+        LOG.debug("Switching to secure data connection")
         ftp.prot_p()
         ftp.cwd(folder)
         files = []
         ftp.retrlines("LIST", files.append)
-        log.debug('{0} files found in folder {1}'.format(len(files), folder))
+        LOG.debug('%s files found in folder %s', len(files), folder)
         for ftp_file in files:
             words = ftp_file.split(None, 8)
             filename = words[-1].lstrip()
-            log.debug("Writing file %s" % filename)
+            LOG.debug("Writing file %s" % filename)
             output_file = os.path.join(output_dir, filename)
             with open(output_file, "wb") as f:
                 ftp.retrbinary("RETR " + filename, f.write, 8*1024)
@@ -51,7 +47,7 @@ def load_to_s3(prefix=None):
     Args:
         prefix (str, optional): Prefix of files to load. Defaults to None.
     """
-    log.info("Loadings files with prefix {0} to S3".format(prefix))
+    LOG.info("Loadings files with prefix {0} to S3".format(prefix))
     s3_bucket = S3_BUCKET
     keys = utils.get_s3_keys(s3_bucket)
     # get all files from output dir that is not in keys
@@ -63,7 +59,7 @@ def load_to_s3(prefix=None):
     if len(unloaded_files) > 0:
         utils.upload_to_s3(s3_bucket, unloaded_files)
     else:
-        log.warning("No files to upload")
+        LOG.warning("No files to upload")
 
     utils.clean_dir(config.FTP_OUTPUT_DIR, prefix=prefix)
 
@@ -107,14 +103,5 @@ def load_ftci_to_postgres():
                             for report_name in loaded_reports]
             load.load_from_object(table_name='loaded_reports', data=load_data)
 
-## Run every 10 minutes
-# download('CSI_files', config.FTP_OUTPUT_DIR)
-# load_to_s3("V1")
-
-## Run twice a day
-download('FTCI_files/Archive', config.FTP_OUTPUT_DIR)
-# load_to_s3("V2")
-
-# load_ftci_to_postgres()
 
 ## TODO: make sure your read from s3 method is returning more than 1000

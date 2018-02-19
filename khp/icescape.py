@@ -1,10 +1,11 @@
 import logging
 import requests
-import config
-import utils
 import json
 
-log = logging.getLogger(__name__)
+from khp import config
+from khp import utils
+
+LOG = logging.getLogger(__name__)
 
 class Icescape():
     """Summary
@@ -27,7 +28,7 @@ class Icescape():
 
     def _get_access_token(self):
         base_url = "https://iceimr16.icescape.com:8189/webapi/Login?"
-        log.info("Getting access token")
+        LOG.info("Getting access token")
         r = requests.post(base_url, params={'userID': self.user,
                                                 'password': self.password})
         utils.check_response(r)
@@ -80,7 +81,7 @@ class Icescape():
             dt2 = utils.parse_date(end_time)
         else:
             dt1, dt2 = utils.yesterdays_range()
-            log.info("Both start_time and end_time were not provided, "
+            LOG.info("Both start_time and end_time were not provided, "
                 "defaulting to start: {} end: {}".format(dt1, dt2))
 
         dt1 = utils.convert_timezone(dt1, tz1, tz2)
@@ -112,9 +113,9 @@ class Icescape():
             'includeAdditionalData': True
         }
         base_url = "https://iceimr16.icescape.com:8189/webapi/QueryContacts2?"
-        log.info("Requesting {} with params:\n{}".format(base_url, params))
+        LOG.info("Requesting {} with params:\n{}".format(base_url, params))
         r = requests.get(base_url, params=params, headers=self.headers)
-        log.debug("Requested: {}".format(r.url))
+        LOG.debug("Requested: {}".format(r.url))
         utils.check_response(r)
         data = r.json()
         return data
@@ -129,7 +130,7 @@ class Icescape():
         """
         base_url = "https://iceimr16.icescape.com:8189/webapi/GetRecordings"
         payload = ["C:{}".format(contact_id) for contact_id in contact_ids]
-        log.info("Requesting {} with payload: {}".format(base_url, payload))
+        LOG.info("Requesting {} with payload: {}".format(base_url, payload))
         r = requests.post(base_url, data=json.dumps(payload),
                             headers=self.headers)
         utils.check_response(r)
