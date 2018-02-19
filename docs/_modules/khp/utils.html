@@ -1,0 +1,533 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>khp.utils &mdash; khp 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="khp 0.1 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> khp
+          
+
+          
+            
+            <img src="../../_static/logo.png" class="logo" />
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Module Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">khp</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>khp.utils</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for khp.utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Utils module, contains utility functions used throughout the codebase.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">boto3</span>
+<span class="kn">import</span> <span class="nn">pytz</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">import</span> <span class="nn">dateutil.parser</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span><span class="p">,</span> <span class="n">date</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<div class="viewcode-block" id="chunker"><a class="viewcode-back" href="../../khp.html#khp.utils.chunker">[docs]</a><span class="k">def</span> <span class="nf">chunker</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Break a list into a set of smaller lists with len = chunk_size</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        seq (list): list to split up into chunks</span>
+<span class="sd">        chunk_size (int): size of chunks</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: list of lists with len = chunk_size</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">seq</span><span class="p">[</span><span class="n">pos</span><span class="p">:</span><span class="n">pos</span> <span class="o">+</span> <span class="n">chunk_size</span><span class="p">]</span> <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span></div>
+            <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">),</span> <span class="n">chunk_size</span><span class="p">))</span>
+
+<div class="viewcode-block" id="generate_date_range"><a class="viewcode-back" href="../../khp.html#khp.utils.generate_date_range">[docs]</a><span class="k">def</span> <span class="nf">generate_date_range</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate the range of dates between start_date and end_date</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        start_date (str): Start date, `YYYY-mm-dd`</span>
+<span class="sd">        end_date (str): End date, `YYYY-mm-dd`</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        date_range (list): List of dates, as datetime.datetime objects, between</span>
+<span class="sd">            start_date and end_date</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pandas_range</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">))</span></div>
+    <span class="k">return</span> <span class="p">[</span><span class="n">dt</span><span class="o">.</span><span class="n">to_pydatetime</span><span class="p">()</span> <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">pandas_range</span><span class="p">]</span>
+
+<div class="viewcode-block" id="read_jason"><a class="viewcode-back" href="../../khp.html#khp.utils.read_jason">[docs]</a><span class="k">def</span> <span class="nf">read_jason</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read a json file into a python object</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filename (str): path of the file</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        data (list or dict): parsed data from the file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</div>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+<div class="viewcode-block" id="write_jason"><a class="viewcode-back" href="../../khp.html#khp.utils.write_jason">[docs]</a><span class="k">def</span> <span class="nf">write_jason</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Write a Python list or dictionary to a json file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data (list or dict): data to write to file</span>
+<span class="sd">        filename (str): path of the file to write to</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Writing data as json to </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span></div>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">outfile</span><span class="p">)</span>
+
+<div class="viewcode-block" id="yesterdays_range"><a class="viewcode-back" href="../../khp.html#khp.utils.yesterdays_range">[docs]</a><span class="k">def</span> <span class="nf">yesterdays_range</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Generate yesterdays date range, in datetime objects</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        start (datetime.datetime): Beginning of yesterday</span>
+<span class="sd">        end (datetime.datetime): End of yesterday</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">yesterday</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">yesterday</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">hour</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">second</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">microsecond</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">23</span><span class="p">,</span> <span class="n">minutes</span><span class="o">=</span><span class="mi">59</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="mi">59</span><span class="p">,</span> <span class="n">milliseconds</span><span class="o">=</span><span class="mi">999</span><span class="p">)</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Yesterday&#39;s range start: </span><span class="si">{}</span><span class="s2"> end: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span></div>
+    <span class="k">return</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span>
+
+<div class="viewcode-block" id="check_response"><a class="viewcode-back" href="../../khp.html#khp.utils.check_response">[docs]</a><span class="k">def</span> <span class="nf">check_response</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check the status of a requests response. If the status code is not 200,</span>
+<span class="sd">    log the error and raise an exception.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        response (requests.models.Response): Requests response object</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">        Exception: If the status code is not 200</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: implement</span>
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Requests error code: </span><span class="si">{0}</span><span class="s2">. Response:</span><span class="se">\n</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Non-200 status code returned&quot;</span><span class="p">)</span></div>
+    <span class="k">return</span>
+
+<div class="viewcode-block" id="parse_date"><a class="viewcode-back" href="../../khp.html#khp.utils.parse_date">[docs]</a><span class="k">def</span> <span class="nf">parse_date</span><span class="p">(</span><span class="n">str_dt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert a date string to a datetime object</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        str_dt (str): Date in any format excepted by dateutil.parser. WARNING:</span>
+<span class="sd">            read the dateutil.parser docs before using to udnerstand default</span>
+<span class="sd">            behaviour (i.e. how str_dt&#39;s like `2018` or `2` are handled)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dt (datetime.datetime): Datetime object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Parsing &#39;</span><span class="si">{}</span><span class="s2">&#39; into datetime object&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">str_dt</span><span class="p">))</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">dateutil</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">str_dt</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">raise</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unable to parse str_dt due to error.&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span>
+
+<div class="viewcode-block" id="convert_timezone"><a class="viewcode-back" href="../../khp.html#khp.utils.convert_timezone">[docs]</a><span class="k">def</span> <span class="nf">convert_timezone</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">tz1</span><span class="p">,</span> <span class="n">tz2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert a datetime object from one timezone to another timezone</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dt (datetime.datime): Datetime object to convert</span>
+<span class="sd">        tz1 (str): pytz acceptable timezone that dt is in</span>
+<span class="sd">        tz1 (str): pytz acceptable timezone to conver to</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dt2 (datetime.datetime): Datetime object in timezone 2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Converting &#39;</span><span class="si">{}</span><span class="s2">&#39; from timezone: &#39;</span><span class="si">{}</span><span class="s2">&#39; to timezone &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">dt</span><span class="p">,</span> <span class="n">tz1</span><span class="p">,</span> <span class="n">tz2</span><span class="p">))</span>
+    <span class="n">timezones</span> <span class="o">=</span> <span class="n">pytz</span><span class="o">.</span><span class="n">all_timezones</span>
+    <span class="k">if</span> <span class="n">tz1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">timezones</span> <span class="ow">or</span> <span class="n">tz2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">timezones</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Supplied timezone(s) not in pytz available timezones. &quot;</span>
+                            <span class="s2">&quot;See pytz.all_timezones for available timezones&quot;</span><span class="p">)</span>
+    <span class="n">zone1</span> <span class="o">=</span> <span class="n">pytz</span><span class="o">.</span><span class="n">timezone</span><span class="p">(</span><span class="n">tz1</span><span class="p">)</span>
+    <span class="n">zone2</span> <span class="o">=</span> <span class="n">pytz</span><span class="o">.</span><span class="n">timezone</span><span class="p">(</span><span class="n">tz2</span><span class="p">)</span>
+    <span class="n">dt1</span> <span class="o">=</span> <span class="n">zone1</span><span class="o">.</span><span class="n">localize</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span> <span class="c1"># not sure how to deal with `is_dst` dynamically..</span>
+    <span class="n">dt2</span> <span class="o">=</span> <span class="n">dt1</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span><span class="n">zone2</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">dt2</span>
+
+<div class="viewcode-block" id="read_yaml"><a class="viewcode-back" href="../../khp.html#khp.utils.read_yaml">[docs]</a><span class="k">def</span> <span class="nf">read_yaml</span><span class="p">(</span><span class="n">yaml_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read a yaml file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        yaml_file (str): Full path of the yaml file.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        data (dict): Dictionary of yaml_file contents.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        Exception: If the yaml_file cannot be opened.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Reading in yaml file </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">yaml_file</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">yaml_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="c1"># use safe_load instead load</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Unable to read file </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">yaml_file</span><span class="p">))</span></div>
+        <span class="k">raise</span>
+
+<div class="viewcode-block" id="upload_to_s3"><a class="viewcode-back" href="../../khp.html#khp.utils.upload_to_s3">[docs]</a><span class="k">def</span> <span class="nf">upload_to_s3</span><span class="p">(</span><span class="n">s3_bucket</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">encrypt</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Upload a list of files to S3.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        s3_bucket (str): Name of the S3 bucket.</span>
+<span class="sd">        files (list): List of files to upload</span>
+<span class="sd">        encrypt (bool, optional): Use serverside AES256 encryption, defaults to</span>
+<span class="sd">            True.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Attempting to load </span><span class="si">{0}</span><span class="s2"> files to s3 bucket: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+             <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">),</span> <span class="n">s3_bucket</span><span class="p">))</span>
+    <span class="n">s3</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="s1">&#39;s3&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">encrypt</span><span class="p">:</span>
+            <span class="n">s3</span><span class="o">.</span><span class="n">Bucket</span><span class="p">(</span><span class="n">s3_bucket</span><span class="p">)</span><span class="o">.</span><span class="n">put_object</span><span class="p">(</span><span class="n">Key</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">Body</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                                            <span class="n">ServerSideEncryption</span><span class="o">=</span><span class="s1">&#39;AES256&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span></div>
+            <span class="n">s3</span><span class="o">.</span><span class="n">Bucket</span><span class="p">(</span><span class="n">s3_bucket</span><span class="p">)</span><span class="o">.</span><span class="n">put_object</span><span class="p">(</span><span class="n">Key</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">Body</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+
+<div class="viewcode-block" id="get_s3_keys"><a class="viewcode-back" href="../../khp.html#khp.utils.get_s3_keys">[docs]</a><span class="k">def</span> <span class="nf">get_s3_keys</span><span class="p">(</span><span class="n">s3_bucket</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get a list of keys in an S3 bucket. Optionally specify a prefix to</span>
+<span class="sd">    narrow down the keys returned.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        s3_bucket (str): Name of the S3 bucket.</span>
+<span class="sd">        prefix (str, optional): File prefix. Defaults to None.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        keys (list): List of keys in the S3 bucket.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">s3</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s1">&#39;s3&#39;</span><span class="p">)</span>
+
+    <span class="n">paginator</span> <span class="o">=</span> <span class="n">s3</span><span class="o">.</span><span class="n">get_paginator</span><span class="p">(</span><span class="s1">&#39;list_objects_v2&#39;</span><span class="p">)</span>
+    <span class="n">filters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Bucket&#39;</span><span class="p">:</span> <span class="n">s3_bucket</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">prefix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">filters</span><span class="p">[</span><span class="s1">&#39;Prefix&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prefix</span>
+    <span class="n">page_iterator</span> <span class="o">=</span> <span class="n">paginator</span><span class="o">.</span><span class="n">paginate</span><span class="p">(</span><span class="o">**</span><span class="n">filters</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">page</span> <span class="ow">in</span> <span class="n">page_iterator</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">page</span><span class="p">[</span><span class="s1">&#39;Contents&#39;</span><span class="p">]:</span>
+            <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s1">&#39;Key&#39;</span><span class="p">])</span></div>
+    <span class="k">return</span> <span class="n">keys</span>
+
+<div class="viewcode-block" id="read_s3_file"><a class="viewcode-back" href="../../khp.html#khp.utils.read_s3_file">[docs]</a><span class="k">def</span> <span class="nf">read_s3_file</span><span class="p">(</span><span class="n">s3_bucket</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read the contents of an S3 object.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        s3_bucket (str): Name of the S3 bucket.</span>
+<span class="sd">        key (str): Name of the S3 object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        contents (str): Contents of S3 object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reading </span><span class="si">{0}</span><span class="s2"> from S3 bucket: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">s3_bucket</span><span class="p">))</span>
+    <span class="n">s3</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="s1">&#39;s3&#39;</span><span class="p">)</span>
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">s3</span><span class="o">.</span><span class="n">Object</span><span class="p">(</span><span class="n">s3_bucket</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+    <span class="n">contents</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">()[</span><span class="s1">&#39;Body&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">contents</span>
+
+<div class="viewcode-block" id="parse_s3_contents"><a class="viewcode-back" href="../../khp.html#khp.utils.parse_s3_contents">[docs]</a><span class="k">def</span> <span class="nf">parse_s3_contents</span><span class="p">(</span><span class="n">contents</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">,</span> <span class="n">remove_dupes</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">skip_first_line</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read the contents of an S3 object into a list of lists.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        contents (str): contents of an S3 object</span>
+<span class="sd">        delimiter (str): delimiter to split the contents of each line with</span>
+<span class="sd">        remove_dupes (bool, optional): ensure each line is unique. Defaults to</span>
+<span class="sd">            False.</span>
+<span class="sd">        skip_first_line (bool, optional): skip the first line of the S3 object.</span>
+<span class="sd">            Defaults to False.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        parsed_contents (list): List of lists, where each tuple is the contents</span>
+<span class="sd">            of a single line.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">contents</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">line</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">remove_dupes</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+    <span class="n">parsed_contents</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">delimiter</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">skip_first_line</span><span class="p">:</span>
+        <span class="n">parsed_contents</span> <span class="o">=</span> <span class="n">parsed_contents</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+</div>
+    <span class="k">return</span> <span class="n">parsed_contents</span>
+
+<div class="viewcode-block" id="search_path"><a class="viewcode-back" href="../../khp.html#khp.utils.search_path">[docs]</a><span class="k">def</span> <span class="nf">search_path</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">like</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Search a path and return all the files. Optionally specify file prefixes</span>
+<span class="sd">    and/or filetypes to narrow your criteria.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path (str): input path</span>
+<span class="sd">        like (list, optional): List of file regexes to match files on</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        files (list): list of files matching the specified filetypes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Searching for files in </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="n">full_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">full_path</span><span class="p">):</span>
+            <span class="n">basename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">full_path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">like</span><span class="p">:</span>
+                <span class="n">matches</span> <span class="o">=</span> <span class="p">[(</span><span class="kc">True</span> <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">reg</span><span class="p">,</span> <span class="n">basename</span><span class="p">)</span> <span class="k">else</span> <span class="kc">False</span><span class="p">)</span>
+                           <span class="k">for</span> <span class="n">reg</span> <span class="ow">in</span> <span class="n">like</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">full_path</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">full_path</span><span class="p">)</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Found </span><span class="si">%s</span><span class="s2"> files in </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">),</span> <span class="n">path</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">files</span>
+
+<div class="viewcode-block" id="clean_dir"><a class="viewcode-back" href="../../khp.html#khp.utils.clean_dir">[docs]</a><span class="k">def</span> <span class="nf">clean_dir</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper function to clear any folders and files in a specified path.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path (str): input path</span>
+<span class="sd">        prefix (str, optional): File prefix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Cleaning folders in </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="n">prefix_check</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">fullPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">fullPath</span><span class="p">):</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">fullPath</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">fullPath</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Successfully removed folder &quot;</span> <span class="o">+</span> <span class="n">fullPath</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fullPath</span><span class="p">):</span>
+            <span class="n">basename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">fullPath</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">prefix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">prefix_check</span> <span class="o">=</span> <span class="n">basename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">prefix_check</span> <span class="ow">and</span> <span class="n">basename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fullPath</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fullPath</span><span class="p">)</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Successfully removed file &quot;</span> <span class="o">+</span> <span class="n">fullPath</span><span class="p">)</span></div>
+    <span class="k">return</span>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Ian Whitestone.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,670 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>khp &mdash; khp 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="khp 0.1 documentation" href="index.html"/>
+        <link rel="up" title="Modules" href="modules.html"/>
+        <link rel="prev" title="Modules" href="modules.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> khp
+          
+
+          
+            
+            <img src="_static/logo.png" class="logo" />
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Module Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">khp</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-khp.contacts">khp.contacts module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#khp-ftp-module">khp.ftp module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-khp.icescape">khp.icescape module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#khp-implicitly-tls-module">khp.implicitly_tls module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-khp.transforms">khp.transforms module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-khp.utils">khp.utils module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">khp</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">Modules</a> &raquo;</li>
+        
+      <li>khp</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/khp.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="khp">
+<h1>khp<a class="headerlink" href="#khp" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-khp.contacts">
+<span id="khp-contacts-module"></span><h2>khp.contacts module<a class="headerlink" href="#module-khp.contacts" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="khp.contacts.download_contacts">
+<code class="descclassname">khp.contacts.</code><code class="descname">download_contacts</code><span class="sig-paren">(</span><em>interaction_type</em>, <em>start_date=None</em>, <em>end_date=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/contacts.html#download_contacts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.contacts.download_contacts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download contacts for a given interaction type and time period, and save
+the data.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">interaction_type (str): Type of contact (i.e. IM, Voice, Email)
+start_date (str, optional): Start time, <cite>YYYY-mm-dd</cite>. Defaults to</p>
+<blockquote>
+<div>beginning of yesterday.</div></blockquote>
+<dl class="last docutils">
+<dt>start_date (str, optional): End time, <cite>YYYY-mm-dd</cite>. Defaults to</dt>
+<dd>end of yesterday.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.contacts.download_transcripts">
+<code class="descclassname">khp.contacts.</code><code class="descname">download_transcripts</code><span class="sig-paren">(</span><em>contact_ids=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/contacts.html#download_transcripts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.contacts.download_transcripts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download transcripts for a list of contact_ids.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>contact_ids (list, optional): List of Contact IDs to retrieve recordings</dt>
+<dd>for. If None are provided (default), queries contacts that have not
+been parsed</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.contacts.get_contacts_to_load">
+<code class="descclassname">khp.contacts.</code><code class="descname">get_contacts_to_load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/contacts.html#get_contacts_to_load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.contacts.get_contacts_to_load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Grab the filenames of all contact files that have not been loaded to
+Postgres.</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>list: List of contact filenames to load</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.contacts.get_transcripts_to_load">
+<code class="descclassname">khp.contacts.</code><code class="descname">get_transcripts_to_load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/contacts.html#get_transcripts_to_load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.contacts.get_transcripts_to_load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Grab the filenames of all transcript files that have not been loaded to
+Postgres</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>list: List of trancsript files to load</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.contacts.main">
+<code class="descclassname">khp.contacts.</code><code class="descname">main</code><span class="sig-paren">(</span><em>interaction_type='IM'</em>, <em>start_date=None</em>, <em>end_date=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/contacts.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.contacts.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="khp.contacts.parse_contacts_file">
+<code class="descclassname">khp.contacts.</code><code class="descname">parse_contacts_file</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/contacts.html#parse_contacts_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.contacts.parse_contacts_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="khp.contacts.parse_transcript">
+<code class="descclassname">khp.contacts.</code><code class="descname">parse_transcript</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/contacts.html#parse_transcript"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.contacts.parse_transcript" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="khp.contacts.save_data">
+<code class="descclassname">khp.contacts.</code><code class="descname">save_data</code><span class="sig-paren">(</span><em>data</em>, <em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/contacts.html#save_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.contacts.save_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save data from icescape API.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>data (list or dict): data to save locally or in S3
+filename (str): filename to save data to</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="khp-ftp-module">
+<h2>khp.ftp module<a class="headerlink" href="#khp-ftp-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-khp.icescape">
+<span id="khp-icescape-module"></span><h2>khp.icescape module<a class="headerlink" href="#module-khp.icescape" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="khp.icescape.Icescape">
+<em class="property">class </em><code class="descclassname">khp.icescape.</code><code class="descname">Icescape</code><a class="reference internal" href="_modules/khp/icescape.html#Icescape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.icescape.Icescape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Summary</p>
+<dl class="docutils">
+<dt>Attributes:</dt>
+<dd>headers (TYPE): Description
+password (TYPE): Description
+token (TYPE): Description
+user (TYPE): Description
+user_agent (TYPE): Description</dd>
+</dl>
+<dl class="method">
+<dt id="khp.icescape.Icescape.get_contacts">
+<code class="descname">get_contacts</code><span class="sig-paren">(</span><em>interaction_type</em>, <em>start_time=None</em>, <em>end_time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/icescape.html#Icescape.get_contacts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.icescape.Icescape.get_contacts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get results from the Icescape QueryContacts2 API.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">interaction_type (str): Type of contact (i.e. IM, Voice, Email)
+start_time (str, optional): Start time, accepts date formats</p>
+<blockquote>
+<div><cite>YYYY-mm-dd</cite> or <cite>YYYY-mm-dd H:M:S</cite>. Defaults to beginning of
+yesterday.</div></blockquote>
+<dl class="last docutils">
+<dt>end_time (str, optional): Start time, accepts date formats</dt>
+<dd><cite>YYYY-mm-dd</cite> or <cite>YYYY-mm-dd H:M:S</cite>. Defaults to end of
+yesterday.</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>data (list): Array of contact data dictionaries</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="khp.icescape.Icescape.get_recordings">
+<code class="descname">get_recordings</code><span class="sig-paren">(</span><em>contact_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/icescape.html#Icescape.get_recordings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.icescape.Icescape.get_recordings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the results from the Icescape GetRecordings API.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>contact_ids (list): List of Contact IDs to retrieve recordings for</dd>
+<dt>Returns:</dt>
+<dd>data (list): Array of contact data dictionaries</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="khp-implicitly-tls-module">
+<h2>khp.implicitly_tls module<a class="headerlink" href="#khp-implicitly-tls-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-khp.transforms">
+<span id="khp-transforms-module"></span><h2>khp.transforms module<a class="headerlink" href="#module-khp.transforms" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="khp.transforms.Transformer">
+<em class="property">class </em><code class="descclassname">khp.transforms.</code><code class="descname">Transformer</code><span class="sig-paren">(</span><em>transforms_meta</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#Transformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.Transformer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="khp.transforms.Transformer.run_transforms">
+<code class="descname">run_transforms</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#Transformer.run_transforms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.Transformer.run_transforms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the transforms on a supplied dictionary of data.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>data (dict):</dd>
+<dt>Returns:</dt>
+<dd><dl class="first last docutils">
+<dt>transformed (list or dict): data that has been parsed, re-mapped and</dt>
+<dd>transformed according to the self.transforms instructions</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.transforms.clean_text">
+<code class="descclassname">khp.transforms.</code><code class="descname">clean_text</code><span class="sig-paren">(</span><em>text</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#clean_text"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.clean_text" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="khp.transforms.parse_handlers">
+<code class="descclassname">khp.transforms.</code><code class="descname">parse_handlers</code><span class="sig-paren">(</span><em>handlers</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#parse_handlers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.parse_handlers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse the handlers associated with a contact. Split out primary handler
+and secondary handlers, assuming primary handler as the first handler in
+the list of handlers.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>handlers (list): List of handlers</dd>
+<dt>Returns:</dt>
+<dd>output (dict): Dictionary containing primary and secondary handlers</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.transforms.parse_html">
+<code class="descclassname">khp.transforms.</code><code class="descname">parse_html</code><span class="sig-paren">(</span><em>html</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#parse_html"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.parse_html" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="khp.transforms.parse_message">
+<code class="descclassname">khp.transforms.</code><code class="descname">parse_message</code><span class="sig-paren">(</span><em>message_text</em>, <em>is_html</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#parse_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.parse_message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="khp.transforms.parse_messages">
+<code class="descclassname">khp.transforms.</code><code class="descname">parse_messages</code><span class="sig-paren">(</span><em>messages</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#parse_messages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.parse_messages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-khp.utils">
+<span id="khp-utils-module"></span><h2>khp.utils module<a class="headerlink" href="#module-khp.utils" title="Permalink to this headline">¶</a></h2>
+<p>Utils module, contains utility functions used throughout the codebase.</p>
+<dl class="function">
+<dt id="khp.utils.check_response">
+<code class="descclassname">khp.utils.</code><code class="descname">check_response</code><span class="sig-paren">(</span><em>response</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#check_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.check_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check the status of a requests response. If the status code is not 200,
+log the error and raise an exception.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>response (requests.models.Response): Requests response object</dd>
+<dt>Raises</dt>
+<dd>Exception: If the status code is not 200</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.utils.chunker">
+<code class="descclassname">khp.utils.</code><code class="descname">chunker</code><span class="sig-paren">(</span><em>seq</em>, <em>chunk_size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#chunker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.chunker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Break a list into a set of smaller lists with len = chunk_size</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>seq (list): list to split up into chunks
+chunk_size (int): size of chunks</dd>
+<dt>Returns:</dt>
+<dd>list: list of lists with len = chunk_size</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.utils.clean_dir">
+<code class="descclassname">khp.utils.</code><code class="descname">clean_dir</code><span class="sig-paren">(</span><em>path</em>, <em>prefix=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#clean_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.clean_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to clear any folders and files in a specified path.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>path (str): input path
+prefix (str, optional): File prefix</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.utils.convert_timezone">
+<code class="descclassname">khp.utils.</code><code class="descname">convert_timezone</code><span class="sig-paren">(</span><em>dt</em>, <em>tz1</em>, <em>tz2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#convert_timezone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.convert_timezone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a datetime object from one timezone to another timezone</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>dt (datetime.datime): Datetime object to convert
+tz1 (str): pytz acceptable timezone that dt is in
+tz1 (str): pytz acceptable timezone to conver to</dd>
+<dt>Returns:</dt>
+<dd>dt2 (datetime.datetime): Datetime object in timezone 2</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.utils.generate_date_range">
+<code class="descclassname">khp.utils.</code><code class="descname">generate_date_range</code><span class="sig-paren">(</span><em>start_date</em>, <em>end_date</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#generate_date_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.generate_date_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate the range of dates between start_date and end_date</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>start_date (str): Start date, <cite>YYYY-mm-dd</cite>
+end_date (str): End date, <cite>YYYY-mm-dd</cite></dd>
+<dt>Returns:</dt>
+<dd><dl class="first last docutils">
+<dt>date_range (list): List of dates, as datetime.datetime objects, between</dt>
+<dd>start_date and end_date</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.utils.get_s3_keys">
+<code class="descclassname">khp.utils.</code><code class="descname">get_s3_keys</code><span class="sig-paren">(</span><em>s3_bucket</em>, <em>prefix=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#get_s3_keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.get_s3_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a list of keys in an S3 bucket. Optionally specify a prefix to
+narrow down the keys returned.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>s3_bucket (str): Name of the S3 bucket.
+prefix (str, optional): File prefix. Defaults to None.</dd>
+<dt>Returns:</dt>
+<dd>keys (list): List of keys in the S3 bucket.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.utils.parse_date">
+<code class="descclassname">khp.utils.</code><code class="descname">parse_date</code><span class="sig-paren">(</span><em>str_dt</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#parse_date"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.parse_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a date string to a datetime object</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>str_dt (str): Date in any format excepted by dateutil.parser. WARNING:</dt>
+<dd>read the dateutil.parser docs before using to udnerstand default
+behaviour (i.e. how str_dt’s like <cite>2018</cite> or <cite>2</cite> are handled)</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>dt (datetime.datetime): Datetime object</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.utils.parse_s3_contents">
+<code class="descclassname">khp.utils.</code><code class="descname">parse_s3_contents</code><span class="sig-paren">(</span><em>contents</em>, <em>delimiter</em>, <em>remove_dupes=False</em>, <em>skip_first_line=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#parse_s3_contents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.parse_s3_contents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the contents of an S3 object into a list of lists.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">contents (str): contents of an S3 object
+delimiter (str): delimiter to split the contents of each line with
+remove_dupes (bool, optional): ensure each line is unique. Defaults to</p>
+<blockquote>
+<div>False.</div></blockquote>
+<dl class="last docutils">
+<dt>skip_first_line (bool, optional): skip the first line of the S3 object.</dt>
+<dd>Defaults to False.</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd><dl class="first last docutils">
+<dt>parsed_contents (list): List of lists, where each tuple is the contents</dt>
+<dd>of a single line.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.utils.read_jason">
+<code class="descclassname">khp.utils.</code><code class="descname">read_jason</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#read_jason"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.read_jason" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a json file into a python object</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>filename (str): path of the file</dd>
+<dt>Returns:</dt>
+<dd>data (list or dict): parsed data from the file</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.utils.read_s3_file">
+<code class="descclassname">khp.utils.</code><code class="descname">read_s3_file</code><span class="sig-paren">(</span><em>s3_bucket</em>, <em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#read_s3_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.read_s3_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the contents of an S3 object.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>s3_bucket (str): Name of the S3 bucket.
+key (str): Name of the S3 object</dd>
+<dt>Returns:</dt>
+<dd>contents (str): Contents of S3 object</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.utils.read_yaml">
+<code class="descclassname">khp.utils.</code><code class="descname">read_yaml</code><span class="sig-paren">(</span><em>yaml_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#read_yaml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.read_yaml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a yaml file.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>yaml_file (str): Full path of the yaml file.</dd>
+<dt>Returns:</dt>
+<dd>data (dict): Dictionary of yaml_file contents.</dd>
+<dt>Raises:</dt>
+<dd>Exception: If the yaml_file cannot be opened.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.utils.search_path">
+<code class="descclassname">khp.utils.</code><code class="descname">search_path</code><span class="sig-paren">(</span><em>path</em>, <em>like=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#search_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.search_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Search a path and return all the files. Optionally specify file prefixes
+and/or filetypes to narrow your criteria.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>path (str): input path
+like (list, optional): List of file regexes to match files on</dd>
+<dt>Returns:</dt>
+<dd>files (list): list of files matching the specified filetypes</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.utils.upload_to_s3">
+<code class="descclassname">khp.utils.</code><code class="descname">upload_to_s3</code><span class="sig-paren">(</span><em>s3_bucket</em>, <em>files</em>, <em>encrypt=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#upload_to_s3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.upload_to_s3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Upload a list of files to S3.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">s3_bucket (str): Name of the S3 bucket.
+files (list): List of files to upload
+encrypt (bool, optional): Use serverside AES256 encryption, defaults to</p>
+<blockquote class="last">
+<div>True.</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.utils.write_jason">
+<code class="descclassname">khp.utils.</code><code class="descname">write_jason</code><span class="sig-paren">(</span><em>data</em>, <em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#write_jason"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.write_jason" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a Python list or dictionary to a json file.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>data (list or dict): data to write to file
+filename (str): path of the file to write to</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.utils.yesterdays_range">
+<code class="descclassname">khp.utils.</code><code class="descname">yesterdays_range</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#yesterdays_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.yesterdays_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate yesterdays date range, in datetime objects</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>start (datetime.datetime): Beginning of yesterday
+end (datetime.datetime): End of yesterday</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="modules.html" class="btn btn-neutral" title="Modules" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Ian Whitestone.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
