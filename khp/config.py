@@ -4,6 +4,9 @@ import os
 from datetime import datetime
 
 from khp import utils
+from pyfiglet import Figlet
+
+FIGLET = Figlet(font='slant')
 
 LOG = logging.getLogger(__name__)
 
@@ -37,3 +40,7 @@ API_TIMEZONE = "UTC"
 
 ## Icescape API constants
 MAX_RESULTS = 10000
+
+
+def log_ascii():
+    LOG.info('\n' + FIGLET.renderText("kid's help phone"))

@@ -1,6 +1,14 @@
 # KHP
+```
+    __   _     ___          __         __               __
+   / /__(_)___/ ( )_____   / /_  ___  / /___     ____  / /_  ____  ____  ___
+  / //_/ / __  /|// ___/  / __ \/ _ \/ / __ \   / __ \/ __ \/ __ \/ __ \/ _ \
+ / ,< / / /_/ /  (__  )  / / / /  __/ / /_/ /  / /_/ / / / / /_/ / / / /  __/
+/_/|_/_/\__,_/  /____/  /_/ /_/\___/_/ .___/  / .___/_/ /_/\____/_/ /_/\___/
+                                    /_/      /_/
+```
 
-This repo is setup to pull down various reports from the KHP FTP server. These reports will then get loaded to a Postgres DB hosted on AWS RDS, for downstream consumption by numerous applications.
+Data infrastructure for the Kids Help Phone.
 
 ## FTP Servers
 

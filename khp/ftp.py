@@ -103,5 +103,19 @@ def load_ftci_to_postgres():
                             for report_name in loaded_reports]
             load.load_from_object(table_name='loaded_reports', data=load_data)
 
+def main():
+    config.log_ascii()
+    ## CSI Files
+    ## Run every 10 minutes
+    download('CSI_files', config.FTP_OUTPUT_DIR)
+    load_to_s3("V1")
+
+    ## FTCI Files
+    ## Run twice per day
+    download('FTCI_files/Archive', config.FTP_OUTPUT_DIR)
+    load_to_s3("V2")
+    load_ftci_to_postgres()
 
 ## TODO: make sure your read from s3 method is returning more than 1000
+if __name__ == '__main__':
+    main()

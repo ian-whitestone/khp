@@ -183,6 +183,8 @@ def get_transcripts_to_load():
     return to_load
 
 def main(interaction_type='IM', start_date=None, end_date=None):
+    config.log_ascii()
+    return
     if start_date is None and end_date is None:
         yesterday = datetime.today() - timedelta(1)
         start_date = yesterday.strftime('%Y-%m-%d')
