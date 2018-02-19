@@ -1,10 +1,11 @@
 import logging
 import requests
-import config
-import utils
 import json
 
-log = logging.getLogger(__name__)
+from khp import config
+from khp import utils
+
+LOG = logging.getLogger(__name__)
 
 class Icescape():
     """Summary
@@ -18,40 +19,26 @@ class Icescape():
     """
 
     def __init__(self):
-        CONF = config.CONFIG['icescape']
-        self.user = CONF['user']
-        self.password = CONF['password']
-        self.user_agent = CONF['user_agent']
+        self.conf = config.CONFIG['icescape']
+        self.user = self.conf['user']
+        self.password = self.conf['password']
+        self.user_agent = self.conf['user_agent']
         self.token = self._get_access_token()
         self.headers = self._build_headers()
 
     def _get_access_token(self):
-        base_url = "https://iceimr16.icescape.com:8189/webapi/Login?"
-        log.info("Getting access token")
+        base_url = self.conf['login_url']
+        LOG.info("Getting access token")
         r = requests.post(base_url, params={'userID': self.user,
-                                                'password': self.password})
+                                            'password': self.password})
         utils.check_response(r)
         data = r.json()
         token = data['AccessToken']
         return token
 
     def _build_headers(self):
-        headers = {
-            "Host": "iceimr16.icescape.com:8189",
-            "Connection": "keep-alive",
-            "Cache-Control": "no-cache, no-store, must-revalidate",
-            "Pragma": "no-cache",
-            "Origin": "https://www22.icescape.com",
-            "Authorization": "Bearer {}".format(self.token),
-            "Content-Type": "application/json; charset=utf-8",
-            "Access-Control-Allow-Origin": "*",
-            "Accept": "application/json, text/plain, */*",
-            "If-Modified-Since": "Mon, 26 Jul 1997 05:00:00 GMT",
-            "User-Agent": self.user_agent,
-            "Referer": "https://www22.icescape.com/KHP/iceManager/",
-            "Accept-Encoding": "gzip, deflate, br",
-            "Accept-Language": "en-US,en;q=0.9,fr;q=0.8"
-        }
+        headers = self.conf['headers']
+        headers['Authorization'] = headers['Authorization'].format(self.token)
         return headers
 
     def _generate_dates(self, start_time, end_time):
@@ -80,7 +67,7 @@ class Icescape():
             dt2 = utils.parse_date(end_time)
         else:
             dt1, dt2 = utils.yesterdays_range()
-            log.info("Both start_time and end_time were not provided, "
+            LOG.info("Both start_time and end_time were not provided, "
                 "defaulting to start: {} end: {}".format(dt1, dt2))
 
         dt1 = utils.convert_timezone(dt1, tz1, tz2)
@@ -111,10 +98,10 @@ class Icescape():
             'endTime': end_time,
             'includeAdditionalData': True
         }
-        base_url = "https://iceimr16.icescape.com:8189/webapi/QueryContacts2?"
-        log.info("Requesting {} with params:\n{}".format(base_url, params))
+        base_url = self.conf['contacts_url']
+        LOG.info("Requesting {} with params:\n{}".format(base_url, params))
         r = requests.get(base_url, params=params, headers=self.headers)
-        log.debug("Requested: {}".format(r.url))
+        LOG.debug("Requested: {}".format(r.url))
         utils.check_response(r)
         data = r.json()
         return data
@@ -127,9 +114,9 @@ class Icescape():
         Returns:
             data (list): Array of contact data dictionaries
         """
-        base_url = "https://iceimr16.icescape.com:8189/webapi/GetRecordings"
+        base_url = self.conf['recordings_url']
         payload = ["C:{}".format(contact_id) for contact_id in contact_ids]
-        log.info("Requesting {} with payload: {}".format(base_url, payload))
+        LOG.info("Requesting {} with payload: {}".format(base_url, payload))
         r = requests.post(base_url, data=json.dumps(payload),
                             headers=self.headers)
         utils.check_response(r)
