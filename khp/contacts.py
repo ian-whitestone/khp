@@ -127,7 +127,7 @@ def parse_transcript(filename):
 
 
     transcript = utils.read_jason(filename)
-    transforms_meta = config.TRANSFORMS["transcript"]
+    transforms_meta = config.TRANSFORMS["recording"]
     optimus = Transformer(transforms_meta)
     output = optimus.run_transforms(transcript)
     messages = output['messages']
@@ -177,9 +177,10 @@ def get_transcripts_to_load():
     to_load = []
     for file in filenames:
         basename = os.path.basename(file)
-        contact_id = basename.split('_data.txt')[0]
+        contact_id = int(basename.split('_data.txt')[0])
         if contact_id not in loaded_contacts:
             to_load.append(basename)
+    LOG.info("%s transcripts to parse and load", len(to_load))
     return to_load
 
 def main(interaction_type='IM', start_date=None, end_date=None):
