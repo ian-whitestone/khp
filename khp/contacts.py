@@ -2,6 +2,7 @@ import logging
 from datetime import timedelta, datetime
 import os
 
+import pandas as pd
 import postgrez
 from khp import utils
 from khp import config
@@ -183,6 +184,54 @@ def get_transcripts_to_load():
     LOG.info("%s transcripts to parse and load", len(to_load))
     return to_load
 
+def load_transcripts(contact_ids):
+    """Load the transcripts data associated with a set of contact_ids into
+    a pandas Dataframe.
+
+    Args:
+        contact_ids (list): List of contact ids to load
+
+    Returns:
+        pandas.Dataframe: Dataframe containing the loaded transcripts
+    """
+    LOG.info("Loading transcripts for contact_ids: \n%s", contact_ids)
+    query = """
+        SELECT * FROM transcripts WHERE contact_id IN ({})
+        ORDER BY contact_id, dt ASC
+        """.format(','.join([str(id) for id in contact_ids]))
+    data = postgrez.execute(query, host=DB_CONF['host'], user=DB_CONF['user'],
+                            password=DB_CONF['pwd'], database=DB_CONF['db'])
+    dataframe = pd.DataFrame(data)
+    return dataframe
+
+def enhanced_transcripts():
+    """Read in un-processed transcripts from Postgres, perform a series of
+    operations to produce metadata per contact_id, load into table
+    enhanced_transcripts
+    """
+    query = """
+        SELECT contact_id FROM transcripts WHERE contact_id NOT IN
+        (SELECT contact_id FROM enhanced_transcripts)
+        GROUP BY 1
+        LIMIT 10
+        """
+    data = postgrez.execute(query, host=DB_CONF['host'], user=DB_CONF['user'],
+                            password=DB_CONF['pwd'], database=DB_CONF['db'])
+    to_load = [record['contact_id'] for record in data]
+
+    transcripts_tforms = config.TRANSFORMS["transcripts"]
+    transcripts_meta_tforms = config.TRANSFORMS['transcript_summary']
+    optimus = Transformer(transcripts_tforms)
+    megatron = Transformer(transcripts_meta_tforms)
+
+    for contact_id in to_load:
+        LOG.info('Processing transcript for contact_id %s', contact_id)
+        dataframe = load_transcripts([contact_id])
+        dataframe = optimus.run_df_transforms(dataframe)
+        summary = megatron.run_meta_df_transforms(dataframe)
+
+    return dataframe
+
 def main(interaction_type='IM', start_date=None, end_date=None):
     config.log_ascii()
     if start_date is None and end_date is None:
@@ -210,7 +259,3 @@ def main(interaction_type='IM', start_date=None, end_date=None):
     for transcript_file in transcripts_to_load:
         full_path = os.path.join(config.ICESCAPE_OUTPUT_DIR, transcript_file)
         parse_transcript(full_path)
-
-if __name__ == '__main__':
-    # main("IM", '2018-02-10', '2018-02-17')
-    main()
