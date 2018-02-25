@@ -43,4 +43,6 @@ MAX_RESULTS = 10000
 
 
 def log_ascii():
+    """Log the KHP ascii art
+    """
     LOG.info('\n' + FIGLET.renderText("kid's help phone"))

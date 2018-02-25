@@ -50,8 +50,8 @@ CREATE TABLE contacts (
   secondary_agents TEXT,
   recording_identifier VARCHAR(15),
   contact_state INTEGER,
-  sender text,
-  receiver text,
+  sender TEXT,
+  receiver TEXT,
   contact_group_name VARCHAR(15),
   transcript_downloaded BOOLEAN,
   load_file VARCHAR(100),
@@ -61,10 +61,65 @@ CREATE TABLE contacts (
 
 CREATE TABLE transcripts (
   contact_id INTEGER,
-  sender text,
+  sender TEXT,
   display_name VARCHAR(100),
   dt TIMESTAMP,
   message_type INTEGER,
   message TEXT
 )
 ;
+
+
+DROP TABLE IF EXISTS enhanced_transcripts;
+CREATE TABLE enhanced_transcripts (
+  contact_id INTEGER,
+
+  -- handle/wait time, in minutes
+  handle_time DECIMAL(10,2),
+  wait_time DECIMAL(10,2),
+
+  khp_message_count INTEGER,
+  ext_message_count INTEGER,
+
+  -- count times responded twice in a row
+  khp_double_message_count INTEGER,
+  ext_double_message_count INTEGER,
+
+  -- word counts aggregated over all messages
+  mean_khp_word_count DECIMAL(10,2),
+  mean_ext_word_count DECIMAL(10,2),
+
+  max_khp_word_count INTEGER,
+  max_ext_word_count INTEGER,
+
+  sum_khp_word_count INTEGER,
+  sum_ext_word_count INTEGER,
+
+  -- reponse time statistics, in seconds
+  mean_khp_response_time DECIMAL(10,2),
+  mean_ext_response_time DECIMAL(10,2),
+
+  max_khp_response_time DECIMAL(10,2),
+  max_ext_response_time DECIMAL(10,2),
+
+  median_khp_response_time DECIMAL(10,2),
+  median_ext_response_time DECIMAL(10,2),
+
+  sum_khp_response_time DECIMAL(10,2),
+  sum_ext_response_time DECIMAL(10,2)
+  -- TODO: add survey info!!
+)
+;
+
+CREATE TABLE queue_meta (
+  queue_id INTEGER,
+  lang_cd char(2),
+  platform varchar(20),
+  PRIMARY KEY (queue_id)
+)
+;
+
+INSERT INTO queue_meta VALUES (6020, 'EN', 'MOBILE');
+INSERT INTO queue_meta VALUES (6007, 'EN', 'DESKTOP');
+INSERT INTO queue_meta VALUES (6021, 'FR', 'MOBILE');
+INSERT INTO queue_meta VALUES (6008, 'FR', 'DESKTOP');

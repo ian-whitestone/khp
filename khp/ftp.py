@@ -117,5 +117,3 @@ def main():
     load_ftci_to_postgres()
 
 ## TODO: make sure your read from s3 method is returning more than 1000
-if __name__ == '__main__':
-    main()

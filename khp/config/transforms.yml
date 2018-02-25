@@ -34,8 +34,164 @@ contacts:
       name: recording_identifier
       type: str
 
-transcript:
+recording:
   - Value|IMMessages|Value:
       name: messages
       type: list
       transform: parse_messages
+
+## transformations to run on the transcripts dataframes
+transcripts:
+  # outer key is the transformation name, inner keys are parameters for the
+  # transform
+  - convo_start_indicator:
+      output: convo_start_ind
+      dtype: int
+      default: 0
+
+  - convo_indicator:
+      output: convo_ind
+      dtype: int
+      default: 0
+
+  - str_length:
+      column_name: message
+      output: message_length
+      dtype: int
+      default: 0
+
+  - word_count:
+      column_name: message
+      output: message_word_count
+      dtype: int
+      default: 0
+
+  - calc_response_time:
+      output: response_time
+      dtype: timedelta64[ns]
+      default: 0
+
+  - calc_message_sequence:
+      output: message_sequence
+      dtype: object
+      default: '0-0'
+
+# transforms/functions to run on the transformed transcript dataframe
+transcript_summary:
+
+  - calc_wait_time:
+      output: wait_time
+
+  - calc_handle_time:
+      output: handle_time
+
+  - row_count:
+      output: khp_message_count
+      filters:
+        - column: convo_ind
+          operator: eq
+          value: 1
+          value_type: int
+        - column: message_type
+          operator: eq
+          value: 3
+          value_type: int
+
+  - row_count:
+      output: ext_message_count
+      filters:
+        - column: convo_ind
+          operator: eq
+          value: 1
+          value_type: int
+        - column: message_type
+          operator: eq
+          value: 4
+          value_type: int
+
+  - row_count:
+      output: khp_double_message_count
+      filters:
+        - column: convo_ind
+          operator: eq
+          value: 1
+          value_type: int
+        - column: message_sequence
+          operator: eq
+          value: 3-3
+          value_type: str
+
+  - row_count:
+      output: ext_double_message_count
+      filters:
+        - column: convo_ind
+          operator: eq
+          value: 1
+          value_type: int
+        - column: message_sequence
+          operator: eq
+          value: 4-4
+          value_type: str
+
+  - column_operator:
+      output: khp_word_count
+      column: message_word_count
+      aggregator: [mean, max, sum]
+      filters:
+        - column: convo_ind
+          operator: eq
+          value: 1
+          value_type: int
+        - column: message_type
+          operator: eq
+          value: 3
+          value_type: int
+
+  - column_operator:
+      output: khp_response_time
+      column: response_time
+      aggregator: [mean, max, median, sum]
+      post_operator:
+        name: convert_timedelta
+        args: 's'
+      filters:
+        - column: convo_ind
+          operator: eq
+          value: 1
+          value_type: int
+        - column: message_type
+          operator: eq
+          value: 3
+          value_type: int
+
+
+  - column_operator:
+      output: ext_word_count
+      column: message_word_count
+      aggregator: [mean, max, sum]
+      filters:
+        - column: convo_ind
+          operator: eq
+          value: 1
+          value_type: int
+        - column: message_type
+          operator: eq
+          value: 4
+          value_type: int
+
+  - column_operator:
+      output: ext_response_time
+      column: response_time
+      aggregator: [mean, max, median, sum]
+      post_operator:
+        name: convert_timedelta
+        args: 's'
+      filters:
+        - column: convo_ind
+          operator: eq
+          value: 1
+          value_type: int
+        - column: message_type
+          operator: eq
+          value: 4
+          value_type: int

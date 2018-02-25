@@ -212,6 +212,14 @@ been parsed</dd>
 </dd></dl>
 
 <dl class="function">
+<dt id="khp.contacts.enhanced_transcripts">
+<code class="descclassname">khp.contacts.</code><code class="descname">enhanced_transcripts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/contacts.html#enhanced_transcripts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.contacts.enhanced_transcripts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read in un-processed transcripts from Postgres, perform a series of
+operations to produce metadata per contact_id, load into table
+enhanced_transcripts</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="khp.contacts.get_contacts_to_load">
 <code class="descclassname">khp.contacts.</code><code class="descname">get_contacts_to_load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/contacts.html#get_contacts_to_load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.contacts.get_contacts_to_load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Grab the filenames of all contact files that have not been loaded to
@@ -230,6 +238,30 @@ Postgres</p>
 <dl class="docutils">
 <dt>Returns:</dt>
 <dd>list: List of trancsript files to load</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.contacts.load_enhanced_transcript">
+<code class="descclassname">khp.contacts.</code><code class="descname">load_enhanced_transcript</code><span class="sig-paren">(</span><em>contact_id</em>, <em>summary</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/contacts.html#load_enhanced_transcript"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.contacts.load_enhanced_transcript" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the transcript summary dictionary to the enhanced_transcripts table</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>contact_id (int): contact id
+summary (dict): Summary dict of the transcript</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.contacts.load_transcripts_df">
+<code class="descclassname">khp.contacts.</code><code class="descname">load_transcripts_df</code><span class="sig-paren">(</span><em>contact_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/contacts.html#load_transcripts_df"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.contacts.load_transcripts_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the transcripts data associated with a set of contact_ids into
+a pandas Dataframe.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>contact_ids (list): List of contact ids to load</dd>
+<dt>Returns:</dt>
+<dd>pandas.Dataframe: Dataframe containing the loaded transcripts</dd>
 </dl>
 </dd></dl>
 
@@ -320,20 +352,126 @@ yesterday.</dd>
 </div>
 <div class="section" id="module-khp.transforms">
 <span id="khp-transforms-module"></span><h2>khp.transforms module<a class="headerlink" href="#module-khp.transforms" title="Permalink to this headline">¶</a></h2>
+<p>Module containing a set of transformations that are run are the JSON
+responses from the API, and the transcript dataframes.</p>
 <dl class="class">
 <dt id="khp.transforms.Transformer">
 <em class="property">class </em><code class="descclassname">khp.transforms.</code><code class="descname">Transformer</code><span class="sig-paren">(</span><em>transforms_meta</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#Transformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.Transformer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class that ingests a dictionary of transforms, and runs those
+transforms on a supplied dictionary or dataframe.</p>
+<dl class="docutils">
+<dt>Attributes:</dt>
+<dd>transforms (list): List of the transformation dictionaries.</dd>
+</dl>
+<dl class="staticmethod">
+<dt id="khp.transforms.Transformer.get_input_cols">
+<em class="property">static </em><code class="descname">get_input_cols</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#Transformer.get_input_cols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.Transformer.get_input_cols" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the input columns associated with a transformation</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>transform_dict (dict): Transform dict parsed from transforms.yml</dd>
+<dt>Returns:</dt>
+<dd>list: list of input columns</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="khp.transforms.Transformer.get_value">
+<em class="property">static </em><code class="descname">get_value</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#Transformer.get_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.Transformer.get_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Grab the value associated with a key in a dictionary. Supports the
+nested key definitions in transforms.yml. For example, a key of
+‘KEY1|KEY2|KEY3’ will return 5 from the following data:</p>
+<dl class="docutils">
+<dt>data = {</dt>
+<dd><dl class="first last docutils">
+<dt>‘KEY1’: {</dt>
+<dd>‘KEY2’: {‘KEY3’: 5, …},
+…</dd>
+</dl>
+</dd>
+</dl>
+<p>}</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>key (str): Dictionary key of the value to return
+data (dict): Dictionary of data to return value from</dd>
+<dt>Returns:</dt>
+<dd>any type: Returns the value associated with the specified key(s)</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="khp.transforms.Transformer.parse_transforms">
+<em class="property">static </em><code class="descname">parse_transforms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#Transformer.parse_transforms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.Transformer.parse_transforms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse the list of raw transformations. Generally, each transformation
+(i.e. each element of transforms_meta) will be in the following format:</p>
+<dl class="docutils">
+<dt>{</dt>
+<dd><dl class="first last docutils">
+<dt>‘field_name’:</dt>
+<dd><dl class="first docutils">
+<dt>{</dt>
+<dd>‘key1’: ‘value1’,
+‘key2’: ‘value2’,
+…</dd>
+</dl>
+<p class="last">}</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>}</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>transforms_meta (list): List of the raw transformation dictionaries.</dd>
+<dt>Returns:</dt>
+<dd>list: List of the transformation dictionaries.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="khp.transforms.Transformer.run_df_transforms">
+<code class="descname">run_df_transforms</code><span class="sig-paren">(</span><em>dataframe</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#Transformer.run_df_transforms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.Transformer.run_df_transforms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the transforms on a supplied dataframe.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>dataframe (pandas.Dataframe): Input dataframe to run transformation</dt>
+<dd>on.</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>pandas.Dataframe: Dataframe with updated and/or new columns</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="khp.transforms.Transformer.run_meta_df_transforms">
+<code class="descname">run_meta_df_transforms</code><span class="sig-paren">(</span><em>dataframe</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#Transformer.run_meta_df_transforms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.Transformer.run_meta_df_transforms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run transforms on a supplied dataframe.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>dataframe (pandas.Dataframe): Input dataframe to run transformation</dt>
+<dd>on.</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>dict: Output dictionary from the input dataframe</dd>
+</dl>
+</dd></dl>
+
 <dl class="method">
 <dt id="khp.transforms.Transformer.run_transforms">
 <code class="descname">run_transforms</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#Transformer.run_transforms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.Transformer.run_transforms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the transforms on a supplied dictionary of data.</p>
 <dl class="docutils">
 <dt>Args:</dt>
-<dd>data (dict):</dd>
+<dd>data (dict): dictionary of data to run transformation on</dd>
 <dt>Returns:</dt>
 <dd><dl class="first last docutils">
-<dt>transformed (list or dict): data that has been parsed, re-mapped and</dt>
+<dt>(list or dict): data that has been parsed, re-mapped and</dt>
 <dd>transformed according to the self.transforms instructions</dd>
 </dl>
 </dd>
@@ -343,9 +481,166 @@ yesterday.</dd>
 </dd></dl>
 
 <dl class="function">
+<dt id="khp.transforms.calc_handle_time">
+<code class="descclassname">khp.transforms.</code><code class="descname">calc_handle_time</code><span class="sig-paren">(</span><em>dataframe</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#calc_handle_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.calc_handle_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the handle time for a contact. Handle time is calculated as
+time elasped between all messages with convo_ind == 1.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>dataframe (pandas.DataFrame): Input dataframe
+parameters (dict): Parameters associated with the transform</dd>
+<dt>Returns:</dt>
+<dd>float: Handle time for the contact, in minutes</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.transforms.calc_message_sequence">
+<code class="descclassname">khp.transforms.</code><code class="descname">calc_message_sequence</code><span class="sig-paren">(</span><em>dataframe</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#calc_message_sequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.calc_message_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the message sequence for each message, defined as:
+‘prev_message_type’ - ‘message_type’, used to indicate whether a message
+was from counsellor to counsellor, counselee to counsellor, system to
+counsellor etc.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>dataframe (pandas.DataFrame): Input dataframe
+parameters (dict): Parameters associated with the transform</dd>
+<dt>Returns:</dt>
+<dd>pandas.Series: Message sequence</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.transforms.calc_response_time">
+<code class="descclassname">khp.transforms.</code><code class="descname">calc_response_time</code><span class="sig-paren">(</span><em>dataframe</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#calc_response_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.calc_response_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the response time for each message. Defined as time elapsed
+between message and previous message.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>dataframe (pandas.DataFrame): Input dataframe
+parameters (dict): Parameters associated with the transform</dd>
+<dt>Returns:</dt>
+<dd>pandas.Series: Response time for the message</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.transforms.calc_wait_time">
+<code class="descclassname">khp.transforms.</code><code class="descname">calc_wait_time</code><span class="sig-paren">(</span><em>dataframe</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#calc_wait_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.calc_wait_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the wait time for a contact. Wait time is calculated as
+time elasped between the start of the transcript and the first message
+with convo_ind == 1.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>dataframe (pandas.DataFrame): Input dataframe
+parameters (dict): Parameters associated with the transform</dd>
+<dt>Returns:</dt>
+<dd>float: Wait time for the contact, in minutes</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
 <dt id="khp.transforms.clean_text">
 <code class="descclassname">khp.transforms.</code><code class="descname">clean_text</code><span class="sig-paren">(</span><em>text</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#clean_text"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.clean_text" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Function to sanitize the trnascript messages. Replaces all whitespace
+with single spaces (since newlines break things when uploading to the DB).
+Get rid of everything that isn’t a number, letter, or in a list of
+characters to keep.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>text (str): Text string to clean</dd>
+<dt>Returns:</dt>
+<dd>str: Cleaned text str</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.transforms.column_operator">
+<code class="descclassname">khp.transforms.</code><code class="descname">column_operator</code><span class="sig-paren">(</span><em>dataframe</em>, <em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#column_operator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.column_operator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a numpy operator on a column in a dataframe, optionally applying
+filters specified in parameters.</p>
+<p>If multiple aggregators are supplied, a dictionary will be returned instead
+of the float result. For example, if the following parameters are provided:</p>
+<dl class="docutils">
+<dt>parameters = {</dt>
+<dd>‘output’: khp_response_time,
+‘aggregator’: [mean, max]</dd>
+</dl>
+<p>}</p>
+<p>Function will return:</p>
+<p>{mean_khp_response_time: 1.2325, max_khp_response_time: 55.212}</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>dataframe (pandas.DataFrame): Input dataframe
+parameters (dict): Parameters associated with the transform</dd>
+<dt>Returns:</dt>
+<dd><dl class="first last docutils">
+<dt>dict or float: If multiple aggregators are supplied, returns a dict</dt>
+<dd>with the result of each aggregator. Otherwise, returns the float
+result of the aggregator operation.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.transforms.convert_timedelta">
+<code class="descclassname">khp.transforms.</code><code class="descname">convert_timedelta</code><span class="sig-paren">(</span><em>value</em>, <em>unit</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#convert_timedelta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.convert_timedelta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a timedelta64 object to a float</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">value (numpy.timedelta64[ns]): Timedelta value to convert
+unit (TYPE): Datetime unit code, see link for a list of acceptable codes</p>
+<blockquote class="last">
+<div><a class="reference external" href="https://docs.scipy.org/doc/numpy-dev/reference/arrays.datetime.html">https://docs.scipy.org/doc/numpy-dev/reference/arrays.datetime.html</a></div></blockquote>
+</dd>
+<dt>Returns:</dt>
+<dd>float: Converted timedelta value</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.transforms.convo_indicator">
+<code class="descclassname">khp.transforms.</code><code class="descname">convo_indicator</code><span class="sig-paren">(</span><em>dataframe</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#convo_indicator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.convo_indicator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an indicator for each message to signal whether it’s part of the
+conversation. A message is deemed part of the conversation if it appears
+after the convo_start_ind messages and is message type 3 or 4.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>dataframe (pandas.DataFrame): Input dataframe
+parameters (dict): Parameters associated with the transform</dd>
+<dt>Returns:</dt>
+<dd>pandas.Series: Conversation indicator</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.transforms.convo_start_indicator">
+<code class="descclassname">khp.transforms.</code><code class="descname">convo_start_indicator</code><span class="sig-paren">(</span><em>dataframe</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#convo_start_indicator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.convo_start_indicator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an indicator for each message to signal whether it’s the start of
+the conversation. Starting messages are detected using a regex, since the
+starting messages are system generated (hence filtering on message_type=1).</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>dataframe (pandas.DataFrame): Input dataframe
+parameters (dict): Parameters associated with the transform</dd>
+<dt>Returns:</dt>
+<dd>pandas.Series: Conversation start indicator</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.transforms.filter_df">
+<code class="descclassname">khp.transforms.</code><code class="descname">filter_df</code><span class="sig-paren">(</span><em>dataframe</em>, <em>filters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#filter_df"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.filter_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter a dataframe</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>dataframe (pandas.DataFrame): Input dataframe
+filters (list): list of filters (dicts) to apply</dd>
+<dt>Returns:</dt>
+<dd>pandas.DataFrame: Filtered dataframe</dd>
+</dl>
+</dd></dl>
 
 <dl class="function">
 <dt id="khp.transforms.parse_handlers">
@@ -357,24 +652,89 @@ the list of handlers.</p>
 <dt>Args:</dt>
 <dd>handlers (list): List of handlers</dd>
 <dt>Returns:</dt>
-<dd>output (dict): Dictionary containing primary and secondary handlers</dd>
+<dd>dict: Dictionary containing primary and secondary handlers</dd>
 </dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="khp.transforms.parse_html">
 <code class="descclassname">khp.transforms.</code><code class="descname">parse_html</code><span class="sig-paren">(</span><em>html</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#parse_html"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.parse_html" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Utilize the beautiful soup html parser to return the text from html</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>html (str): String of html</dd>
+<dt>Returns:</dt>
+<dd>str: extracted text</dd>
+</dl>
+</dd></dl>
 
 <dl class="function">
 <dt id="khp.transforms.parse_message">
 <code class="descclassname">khp.transforms.</code><code class="descname">parse_message</code><span class="sig-paren">(</span><em>message_text</em>, <em>is_html</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#parse_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.parse_message" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Return the text from a (potentially) html message string</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">message_text (str): Description
+is_html (bool): Boolean indicator whether the text is html, provided</p>
+<blockquote class="last">
+<div>upstream from the API response.</div></blockquote>
+</dd>
+<dt>Returns:</dt>
+<dd>str: Parsed message text</dd>
+</dl>
+</dd></dl>
 
 <dl class="function">
 <dt id="khp.transforms.parse_messages">
 <code class="descclassname">khp.transforms.</code><code class="descname">parse_messages</code><span class="sig-paren">(</span><em>messages</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#parse_messages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.parse_messages" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Transformation function to parse a list of messages</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>messages (list): List of message dicts</dd>
+<dt>Returns:</dt>
+<dd>list: List of transformed message dicts</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.transforms.row_count">
+<code class="descclassname">khp.transforms.</code><code class="descname">row_count</code><span class="sig-paren">(</span><em>dataframe</em>, <em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#row_count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.row_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Count the number of rows in a dataframe, optionally applying filters
+specified in parameters.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>dataframe (pandas.DataFrame): Input dataframe
+parameters (dict): Parameters associated with the transform</dd>
+<dt>Returns:</dt>
+<dd>int: Number of rows</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.transforms.str_length">
+<code class="descclassname">khp.transforms.</code><code class="descname">str_length</code><span class="sig-paren">(</span><em>dataframe</em>, <em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#str_length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.str_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the length of a string</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>dataframe (pandas.DataFrame): Input dataframe
+parameters (dict): Parameters associated with the transform</dd>
+<dt>Returns:</dt>
+<dd>pandas.Series: Number of characters for each row of a column</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="khp.transforms.word_count">
+<code class="descclassname">khp.transforms.</code><code class="descname">word_count</code><span class="sig-paren">(</span><em>dataframe</em>, <em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#word_count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.word_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Count the number of words in a string</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>dataframe (pandas.DataFrame): Input dataframe
+parameters (dict): Parameters associated with the transform</dd>
+<dt>Returns:</dt>
+<dd>pandas.Series: Word counts for each row of a column</dd>
+</dl>
+</dd></dl>
 
 </div>
 <div class="section" id="module-khp.utils">
