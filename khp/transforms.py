@@ -1,3 +1,6 @@
+"""Module containing a set of transformations that are run are the JSON
+responses from the API, and the transcript dataframes.
+"""
 import logging
 import re
 import sys
@@ -7,7 +10,7 @@ import pandas as pd
 
 LOG = logging.getLogger(__name__)
 
-def convo_start_indicator(dataframe, parameters):
+def convo_start_indicator(dataframe):
     """Create an indicator for each message to signal whether it's the start of
     the conversation. Starting messages are detected using a regex, since the
     starting messages are system generated (hence filtering on message_type=1).
@@ -26,7 +29,7 @@ def convo_start_indicator(dataframe, parameters):
     convo_start_ind.loc[mtype_check & reg_check] = 1
     return convo_start_ind
 
-def convo_indicator(dataframe, parameters):
+def convo_indicator(dataframe):
     """Create an indicator for each message to signal whether it's part of the
     conversation. A message is deemed part of the conversation if it appears
     after the convo_start_ind messages and is message type 3 or 4.
@@ -38,14 +41,14 @@ def convo_indicator(dataframe, parameters):
     Returns:
         pandas.Series: Conversation indicator
     """
-    mtype_check = dataframe['message_type'].isin([3,4])
+    mtype_check = dataframe['message_type'].isin([3, 4])
     start_index = max(dataframe[dataframe['convo_start_ind'] == 1].index)
     index_check = dataframe.index > start_index
     convo_ind = pd.Series(0, index=dataframe.index)
     convo_ind.loc[mtype_check & index_check] = 1
     return convo_ind
 
-def calc_wait_time(dataframe, parameters):
+def calc_wait_time(dataframe):
     """Calculate the wait time for a contact. Wait time is calculated as
     time elasped between the start of the transcript and the first message
     with convo_ind == 1.
@@ -63,7 +66,7 @@ def calc_wait_time(dataframe, parameters):
                           index=dataframe.index)
     return wait_time
 
-def calc_handle_time(dataframe, parameters):
+def calc_handle_time(dataframe):
     """Calculate the handle time for a contact. Handle time is calculated as
     time elasped between all messages with convo_ind == 1.
 
@@ -80,7 +83,7 @@ def calc_handle_time(dataframe, parameters):
                             index=dataframe.index)
     return handle_time
 
-def calc_response_time(dataframe, parameters):
+def calc_response_time(dataframe):
     """Calculate the response time for each message. Defined as time elapsed
     between message and previous message.
 
@@ -96,7 +99,7 @@ def calc_response_time(dataframe, parameters):
     dataframe.loc[null_check, 'prev_message_time'] = dataframe['dt']
     return dataframe['dt'] - dataframe['prev_message_time']
 
-def calc_message_sequence(dataframe, parameters):
+def calc_message_sequence(dataframe):
     """Calculate the message sequence for each message, defined as:
     'prev_message_type' - 'message_type', used to indicate whether a message
     was from counsellor to counsellor, counselee to counsellor, system to
@@ -165,6 +168,14 @@ def parse_handlers(handlers):
     return output
 
 def parse_html(html):
+    """Utilize the beautiful soup html parser to return the text from html
+
+    Args:
+        html (str): String of html
+
+    Returns:
+        str: extracted text
+    """
     soup = BeautifulSoup(html, 'html.parser')
     return soup.get_text()
 
@@ -223,8 +234,8 @@ def parse_messages(messages):
     output_messages = []
     for message in messages:
         # remap message dict keys with the name_map specified above
-        transformed = {name_map[k]:v for k,v in message.items()
-                        if k in name_map.keys()}
+        transformed = {name_map[k]:v for k, v in message.items()
+                       if k in name_map.keys()}
         transformed['message'] = parse_message(transformed['message'],
                                                message['IsHtml'])
         output_messages.append(transformed)
@@ -245,10 +256,10 @@ class Transformer():
         Args:
             transforms_meta (list): List of the raw transformation dictionaries.
         """
-        self.transforms = self._parse_transforms(transforms_meta)
+        self.transforms = self.parse_transforms(transforms_meta)
 
-
-    def _get_value(self, key, data):
+    @staticmethod
+    def get_value(key, data):
         """Grab the value associated with a key in a dictionary. Supports the
         nested key definitions in transforms.yml. For example, a key of
         'KEY1|KEY2|KEY3' will return 5 from the following data:
@@ -271,8 +282,8 @@ class Transformer():
         keys = key.split('|')
         return reduce(lambda c, k: c.get(k, {}), keys, data)
 
-
-    def _parse_transforms(self, transforms_meta):
+    @staticmethod
+    def parse_transforms(transforms_meta):
         """Parse the list of raw transformations. Generally, each transformation
         (i.e. each element of transforms_meta) will be in the following format:
 
@@ -302,7 +313,8 @@ class Transformer():
             transforms.append({'name': field_name, 'items': items})
         return transforms
 
-    def _get_input_cols(self, transform_dict):
+    @staticmethod
+    def get_input_cols(transform_dict):
         """Return the input columns associated with a transformation
 
         Args:
@@ -312,7 +324,7 @@ class Transformer():
             list: list of input columns
         """
         input_cols = transform_dict['input']
-        if type(input_cols) != list:
+        if not isinstance(input_cols, list):
             input_cols = [input_cols]
         return input_cols
 
@@ -328,12 +340,16 @@ class Transformer():
         """
         for tform in self.transforms:
             transform_name = tform['name']
-            # input_cols = self._get_input_cols(tform['items'])
+            # input_cols = self.get_input_cols(tform['items'])
             parameters = tform['items']
             output_name = parameters['output']
             transform = getattr(sys.modules[__name__], transform_name)
             LOG.info('Running transform: %s on input dataframe', transform_name)
-            dataframe[output_name] = transform(dataframe, parameters)
+            if 'parameters' in transform.__code__.co_varnames:
+                dataframe[output_name] = transform(dataframe, parameters)
+            else:
+                dataframe[output_name] = transform(dataframe)
+
         return dataframe
 
     def run_meta_df_transforms(self, dataframe):
@@ -353,8 +369,11 @@ class Transformer():
             output_name = parameters['output']
             transform = getattr(sys.modules[__name__], transform_name)
             LOG.info('Running transform: %s on input dataframe', transform_name)
-            output = transform(dataframe, parameters)
-            if type(output) == dict:
+            if 'parameters' in transform.__code__.co_varnames:
+                output = transform(dataframe, parameters)
+            else:
+                output = transform(dataframe)
+            if isinstance(output, dict):
                 metadata = {**metadata, **output}
             else:
                 metadata[output_name] = output
@@ -372,16 +391,16 @@ class Transformer():
         """
         transformed = {}
         for transform in self.transforms:
-            value = self._get_value(transform['name'], data)
+            value = self.get_value(transform['name'], data)
             items = transform['items']
             if "transform" in items.keys():
                 LOG.info("Running transform: %s on input data",
                          items["transform"])
-                value = getattr(sys.modules[__name__], items["transform"])(
-                        value)
+                tform_func = getattr(sys.modules[__name__], items["transform"])
+                value = tform_func(value)
 
             # Some transforms may return two fields, i.e. {'a': 5, 'b': 10}
-            if type(value) == dict:
+            if isinstance(value, dict):
                 transformed = {**transformed, **value}
             else:
                 transformed[items["name"]] = value
