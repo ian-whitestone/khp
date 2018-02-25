@@ -16,7 +16,7 @@ handlers:
 
 loggers:
   postgrez:
-    level: DEBUG
+    level: INFO
   khp:
     level: DEBUG
   botocore:

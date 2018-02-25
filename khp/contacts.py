@@ -184,7 +184,7 @@ def get_transcripts_to_load():
     LOG.info("%s transcripts to parse and load", len(to_load))
     return to_load
 
-def load_transcripts(contact_ids):
+def load_transcripts_df(contact_ids):
     """Load the transcripts data associated with a set of contact_ids into
     a pandas Dataframe.
 
@@ -194,7 +194,7 @@ def load_transcripts(contact_ids):
     Returns:
         pandas.Dataframe: Dataframe containing the loaded transcripts
     """
-    LOG.info("Loading transcripts for contact_ids: \n%s", contact_ids)
+    LOG.info("Loading transcripts for contact_ids: %s", contact_ids)
     query = """
         SELECT * FROM transcripts WHERE contact_id IN ({})
         ORDER BY contact_id, dt ASC
@@ -203,6 +203,22 @@ def load_transcripts(contact_ids):
                             password=DB_CONF['pwd'], database=DB_CONF['db'])
     dataframe = pd.DataFrame(data)
     return dataframe
+
+def load_enhanced_transcript(contact_id, summary):
+    """Load the transcript summary dictionary to the enhanced_transcripts table
+
+    Args:
+        contact_id (int): contact id
+        summary (dict): Summary dict of the transcript
+    """
+
+    columns = list(summary.keys())
+    load_data = [[contact_id] + [summary[key] for key in columns]]
+    columns = ['contact_id'] + columns
+
+    postgrez.load(table_name="enhanced_transcripts", data=load_data,
+                  columns=columns, host=DB_CONF['host'], user=DB_CONF['user'],
+                  password=DB_CONF['pwd'], database=DB_CONF['db'])
 
 def enhanced_transcripts():
     """Read in un-processed transcripts from Postgres, perform a series of
@@ -213,7 +229,6 @@ def enhanced_transcripts():
         SELECT contact_id FROM transcripts WHERE contact_id NOT IN
         (SELECT contact_id FROM enhanced_transcripts)
         GROUP BY 1
-        LIMIT 10
         """
     data = postgrez.execute(query, host=DB_CONF['host'], user=DB_CONF['user'],
                             password=DB_CONF['pwd'], database=DB_CONF['db'])
@@ -226,11 +241,11 @@ def enhanced_transcripts():
 
     for contact_id in to_load:
         LOG.info('Processing transcript for contact_id %s', contact_id)
-        dataframe = load_transcripts([contact_id])
+        dataframe = load_transcripts_df([contact_id])
         dataframe = optimus.run_df_transforms(dataframe)
         summary = megatron.run_meta_df_transforms(dataframe)
-
-    return dataframe
+        load_enhanced_transcript(contact_id, summary)
+    return
 
 def main(interaction_type='IM', start_date=None, end_date=None):
     config.log_ascii()

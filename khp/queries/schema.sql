@@ -70,40 +70,44 @@ CREATE TABLE transcripts (
 ;
 
 
+DROP TABLE IF EXISTS enhanced_transcripts;
 CREATE TABLE enhanced_transcripts (
   contact_id INTEGER,
-  handle_time INTEGER,
-  wait_time INTEGER,
+
+  -- handle/wait time, in minutes
+  handle_time DECIMAL(10,2),
+  wait_time DECIMAL(10,2),
 
   khp_message_count INTEGER,
-  khp_double_message_count INTEGER, -- count times responded twice in a row
-  khp_mean_message_length DECIMAL(6,2),
-  khp_max_message_length INTEGER,
-  khp_mean_word_count DECIMAL(6,2),
-  khp_max_word_count INTEGER,
-  khp_sum_word_count INTEGER,
-
-  khp_mean_response_time DECIMAL(5,2), -- in seconds
-  khp_max_response_time DECIMAL(5,2),
-  khp_median_response_time DECIMAL(5,2),
-  khp_sum_response_time DECIMAL(5,2),
-
-
   ext_message_count INTEGER,
-  ext_double_message_count INTEGER, -- count times responded twice in a row
-  ext_mean_message_length DECIMAL(6,2),
-  ext_max_message_length INTEGER,
-  ext_mean_word_count DECIMAL(6,2),
-  ext_max_word_count INTEGER,
-  ext_sum_word_count INTEGER,
 
-  ext_mean_response_time DECIMAL(5,2), -- in seconds
-  ext_max_response_time DECIMAL(5,2),
-  ext_median_response_time DECIMAL(5,2),
-  ext_sum_response_time DECIMAL(5,2),
+  -- count times responded twice in a row
+  khp_double_message_count INTEGER,
+  ext_double_message_count INTEGER,
 
+  -- word counts aggregated over all messages
+  mean_khp_word_count DECIMAL(10,2),
+  mean_ext_word_count DECIMAL(10,2),
+
+  max_khp_word_count INTEGER,
+  max_ext_word_count INTEGER,
+
+  sum_khp_word_count INTEGER,
+  sum_ext_word_count INTEGER,
+
+  -- reponse time statistics, in seconds
+  mean_khp_response_time DECIMAL(10,2),
+  mean_ext_response_time DECIMAL(10,2),
+
+  max_khp_response_time DECIMAL(10,2),
+  max_ext_response_time DECIMAL(10,2),
+
+  median_khp_response_time DECIMAL(10,2),
+  median_ext_response_time DECIMAL(10,2),
+
+  sum_khp_response_time DECIMAL(10,2),
+  sum_ext_response_time DECIMAL(10,2)
   -- TODO: add survey info!!
-
 )
 ;
 

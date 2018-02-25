@@ -1,12 +1,15 @@
 """Module containing a set of transformations that are run are the JSON
 responses from the API, and the transcript dataframes.
 """
+import builtins
 import logging
+import operator
 import re
 import sys
 from functools import reduce
 from bs4 import BeautifulSoup
 import pandas as pd
+import numpy as np
 
 LOG = logging.getLogger(__name__)
 
@@ -58,13 +61,11 @@ def calc_wait_time(dataframe):
         parameters (dict): Parameters associated with the transform
 
     Returns:
-        pandas.Series: Wait time for the contact (same value repeated)
+        float: Wait time for the contact, in minutes
     """
     start_queue_time = dataframe['dt'].min()
     end_queue_time = dataframe[dataframe['convo_ind'] == 1]['dt'].min()
-    wait_time = pd.Series(end_queue_time-start_queue_time,
-                          index=dataframe.index)
-    return wait_time
+    return convert_timedelta((end_queue_time-start_queue_time), 'm')
 
 def calc_handle_time(dataframe):
     """Calculate the handle time for a contact. Handle time is calculated as
@@ -75,13 +76,11 @@ def calc_handle_time(dataframe):
         parameters (dict): Parameters associated with the transform
 
     Returns:
-        pandas.Series: Handle time for the contact (same value repeated)
+        float: Handle time for the contact, in minutes
     """
     start_convo_time = dataframe[dataframe['convo_ind'] == 1]['dt'].min()
     end_convo_time = dataframe[dataframe['convo_ind'] == 1]['dt'].max()
-    handle_time = pd.Series(end_convo_time-start_convo_time,
-                            index=dataframe.index)
-    return handle_time
+    return convert_timedelta((end_convo_time-start_convo_time), 'm')
 
 def calc_response_time(dataframe):
     """Calculate the response time for each message. Defined as time elapsed
@@ -141,7 +140,8 @@ def word_count(dataframe, parameters):
     Returns:
         pandas.Series: Word counts for each row of a column
     """
-    return dataframe[parameters['column_name']].str.split().apply(len)
+    str_series = dataframe[parameters['column_name']].fillna('')
+    return str_series.str.split().apply(len)
 
 def parse_handlers(handlers):
     """Parse the handlers associated with a contact. Split out primary handler
@@ -152,7 +152,7 @@ def parse_handlers(handlers):
         handlers (list): List of handlers
 
     Returns:
-        output (dict): Dictionary containing primary and secondary handlers
+        dict: Dictionary containing primary and secondary handlers
     """
     output = {}
     if not handlers: # no handlers on the call
@@ -166,6 +166,110 @@ def parse_handlers(handlers):
         output["secondary_agents"] = ",".join(handlers[1:])
 
     return output
+
+def filter_df(dataframe, filters):
+    """Filter a dataframe
+
+    Args:
+        dataframe (pandas.DataFrame): Input dataframe
+        filters (list): list of filters (dicts) to apply
+
+    Returns:
+        pandas.DataFrame: Filtered dataframe
+    """
+    for fltr_dict in filters:
+        fltr_fn = getattr(operator, fltr_dict['operator'])
+        fltr_value = fltr_dict['value']
+        fltr_value = getattr(builtins, fltr_dict['value_type'])(fltr_value)
+        fltr_check = fltr_fn(dataframe[fltr_dict['column']], fltr_value)
+        fltr_df = dataframe[fltr_check]
+    return fltr_df
+
+def row_count(dataframe, parameters):
+    """Count the number of rows in a dataframe, optionally applying filters
+    specified in parameters.
+
+    Args:
+        dataframe (pandas.DataFrame): Input dataframe
+        parameters (dict): Parameters associated with the transform
+
+    Returns:
+        int: Number of rows
+    """
+    if 'filters' in parameters.keys():
+        fltr_df = filter_df(dataframe, parameters['filters'])
+    else:
+        fltr_df = dataframe
+
+    return fltr_df.shape[0]
+
+def column_operator(dataframe, parameters):
+    """Apply a numpy operator on a column in a dataframe, optionally applying
+    filters specified in parameters.
+
+    If multiple aggregators are supplied, a dictionary will be returned instead
+    of the float result. For example, if the following parameters are provided:
+
+    parameters = {
+        'output': khp_response_time,
+        'aggregator': [mean, max]
+    }
+
+    Function will return:
+
+    {mean_khp_response_time: 1.2325, max_khp_response_time: 55.212}
+
+    Args:
+        dataframe (pandas.DataFrame): Input dataframe
+        parameters (dict): Parameters associated with the transform
+
+    Returns:
+        dict or float: If multiple aggregators are supplied, returns a dict
+            with the result of each aggregator. Otherwise, returns the float
+            result of the aggregator operation.
+    """
+    fltr_df = dataframe
+    if 'filters' in parameters.keys():
+        fltr_df = filter_df(dataframe, parameters['filters'])
+
+    post_operator = None
+    if 'post_operator' in parameters.keys():
+        post = parameters['post_operator']
+        post_operator = getattr(sys.modules[__name__], post['name'])
+        post_args = post['args']
+
+    if isinstance(parameters['aggregator'], list):
+        result = {}
+        for agg_name in parameters['aggregator']:
+            agg = getattr(np, agg_name)
+            output_name = '{}_{}'.format(agg_name, parameters['output'])
+            series = getattr(dataframe, parameters['column'])
+            if post_operator:
+                result[output_name] = post_operator(agg(series), post_args)
+            else:
+                result[output_name] = agg(series)
+    else:
+        agg_name = parameters['aggregator']
+        agg = getattr(np, agg_name)
+        series = getattr(dataframe, parameters['column'])
+        if post_operator:
+            result = post_operator(agg(series), post_args)
+        else:
+            result = agg(series)
+    return result
+
+def convert_timedelta(value, unit):
+    """Convert a timedelta64 object to a float
+
+    Args:
+        value (numpy.timedelta64[ns]): Timedelta value to convert
+        unit (TYPE): Datetime unit code, see link for a list of acceptable codes
+            https://docs.scipy.org/doc/numpy-dev/reference/arrays.datetime.html
+
+    Returns:
+        float: Converted timedelta value
+    """
+    return value / np.timedelta64(1, unit)
 
 def parse_html(html):
     """Utilize the beautiful soup html parser to return the text from html
@@ -344,7 +448,8 @@ class Transformer():
             parameters = tform['items']
             output_name = parameters['output']
             transform = getattr(sys.modules[__name__], transform_name)
-            LOG.info('Running transform: %s on input dataframe', transform_name)
+            LOG.info('Running transform: %s on input dataframe with params %s',
+                     transform_name, parameters)
             if 'parameters' in transform.__code__.co_varnames:
                 dataframe[output_name] = transform(dataframe, parameters)
             else:
@@ -368,7 +473,8 @@ class Transformer():
             parameters = tform['items']
             output_name = parameters['output']
             transform = getattr(sys.modules[__name__], transform_name)
-            LOG.info('Running transform: %s on input dataframe', transform_name)
+            LOG.info('Running transform: %s on input dataframe with params %s',
+                     transform_name, parameters)
             if 'parameters' in transform.__code__.co_varnames:
                 output = transform(dataframe, parameters)
             else:
@@ -394,9 +500,9 @@ class Transformer():
             value = self.get_value(transform['name'], data)
             items = transform['items']
             if "transform" in items.keys():
-                LOG.info("Running transform: %s on input data",
-                         items["transform"])
-                tform_func = getattr(sys.modules[__name__], items["transform"])
+                func_name = items["transform"]
+                LOG.info('Running transform: %s on data', func_name)
+                tform_func = getattr(sys.modules[__name__], func_name)
                 value = tform_func(value)
 
             # Some transforms may return two fields, i.e. {'a': 5, 'b': 10}

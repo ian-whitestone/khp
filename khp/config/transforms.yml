@@ -85,8 +85,113 @@ transcript_summary:
   - calc_handle_time:
       output: handle_time
 
+  - row_count:
+      output: khp_message_count
+      filters:
+        - column: convo_ind
+          operator: eq
+          value: 1
+          value_type: int
+        - column: message_type
+          operator: eq
+          value: 3
+          value_type: int
+
+  - row_count:
+      output: ext_message_count
+      filters:
+        - column: convo_ind
+          operator: eq
+          value: 1
+          value_type: int
+        - column: message_type
+          operator: eq
+          value: 4
+          value_type: int
+
+  - row_count:
+      output: khp_double_message_count
+      filters:
+        - column: convo_ind
+          operator: eq
+          value: 1
+          value_type: int
+        - column: message_sequence
+          operator: eq
+          value: 3-3
+          value_type: str
+
+  - row_count:
+      output: ext_double_message_count
+      filters:
+        - column: convo_ind
+          operator: eq
+          value: 1
+          value_type: int
+        - column: message_sequence
+          operator: eq
+          value: 4-4
+          value_type: str
+
+  - column_operator:
+      output: khp_word_count
+      column: message_word_count
+      aggregator: [mean, max, sum]
+      filters:
+        - column: convo_ind
+          operator: eq
+          value: 1
+          value_type: int
+        - column: message_type
+          operator: eq
+          value: 3
+          value_type: int
+
+  - column_operator:
+      output: khp_response_time
+      column: response_time
+      aggregator: [mean, max, median, sum]
+      post_operator:
+        name: convert_timedelta
+        args: 's'
+      filters:
+        - column: convo_ind
+          operator: eq
+          value: 1
+          value_type: int
+        - column: message_type
+          operator: eq
+          value: 3
+          value_type: int
 
 
-##NOTES:
-# Eventually, these transforms could be split up into ones that need to be run
-# on slice, and ones that can run on entire column
+  - column_operator:
+      output: ext_word_count
+      column: message_word_count
+      aggregator: [mean, max, sum]
+      filters:
+        - column: convo_ind
+          operator: eq
+          value: 1
+          value_type: int
+        - column: message_type
+          operator: eq
+          value: 4
+          value_type: int
+
+  - column_operator:
+      output: ext_response_time
+      column: response_time
+      aggregator: [mean, max, median, sum]
+      post_operator:
+        name: convert_timedelta
+        args: 's'
+      filters:
+        - column: convo_ind
+          operator: eq
+          value: 1
+          value_type: int
+        - column: message_type
+          operator: eq
+          value: 4
+          value_type: int
