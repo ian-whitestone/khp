@@ -160,10 +160,150 @@
            <div itemprop="articleBody">
             
   <h1>Source code for khp.transforms</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">re</span>
+<span></span><span class="sd">&quot;&quot;&quot;Module containing a set of transformations that are run are the JSON</span>
+<span class="sd">responses from the API, and the transcript dataframes.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">builtins</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">reduce</span>
 <span class="kn">from</span> <span class="nn">bs4</span> <span class="k">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<div class="viewcode-block" id="convo_start_indicator"><a class="viewcode-back" href="../../khp.html#khp.transforms.convo_start_indicator">[docs]</a><span class="k">def</span> <span class="nf">convo_start_indicator</span><span class="p">(</span><span class="n">dataframe</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create an indicator for each message to signal whether it&#39;s the start of</span>
+<span class="sd">    the conversation. Starting messages are detected using a regex, since the</span>
+<span class="sd">    starting messages are system generated (hence filtering on message_type=1).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataframe (pandas.DataFrame): Input dataframe</span>
+<span class="sd">        parameters (dict): Parameters associated with the transform</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pandas.Series: Conversation start indicator</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">joined_reg</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;(?:(?:joined\sthe\s)|(?:sest\sjoint\s.\sla\s))conversation\.&quot;</span>
+    <span class="n">mtype_check</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;message_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="n">reg_check</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">joined_reg</span><span class="p">)</span>
+    <span class="n">convo_start_ind</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">dataframe</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="n">convo_start_ind</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mtype_check</span> <span class="o">&amp;</span> <span class="n">reg_check</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></div>
+    <span class="k">return</span> <span class="n">convo_start_ind</span>
+
+<div class="viewcode-block" id="convo_indicator"><a class="viewcode-back" href="../../khp.html#khp.transforms.convo_indicator">[docs]</a><span class="k">def</span> <span class="nf">convo_indicator</span><span class="p">(</span><span class="n">dataframe</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create an indicator for each message to signal whether it&#39;s part of the</span>
+<span class="sd">    conversation. A message is deemed part of the conversation if it appears</span>
+<span class="sd">    after the convo_start_ind messages and is message type 3 or 4.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataframe (pandas.DataFrame): Input dataframe</span>
+<span class="sd">        parameters (dict): Parameters associated with the transform</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pandas.Series: Conversation indicator</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mtype_check</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;message_type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+    <span class="n">start_index</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">dataframe</span><span class="p">[</span><span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;convo_start_ind&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="n">index_check</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;</span> <span class="n">start_index</span>
+    <span class="n">convo_ind</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">dataframe</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="n">convo_ind</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mtype_check</span> <span class="o">&amp;</span> <span class="n">index_check</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></div>
+    <span class="k">return</span> <span class="n">convo_ind</span>
+
+<div class="viewcode-block" id="calc_wait_time"><a class="viewcode-back" href="../../khp.html#khp.transforms.calc_wait_time">[docs]</a><span class="k">def</span> <span class="nf">calc_wait_time</span><span class="p">(</span><span class="n">dataframe</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the wait time for a contact. Wait time is calculated as</span>
+<span class="sd">    time elasped between the start of the transcript and the first message</span>
+<span class="sd">    with convo_ind == 1.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataframe (pandas.DataFrame): Input dataframe</span>
+<span class="sd">        parameters (dict): Parameters associated with the transform</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Wait time for the contact, in minutes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">start_queue_time</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    <span class="n">end_queue_time</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;convo_ind&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">][</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">convert_timedelta</span><span class="p">((</span><span class="n">end_queue_time</span><span class="o">-</span><span class="n">start_queue_time</span><span class="p">),</span> <span class="s1">&#39;m&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="calc_handle_time"><a class="viewcode-back" href="../../khp.html#khp.transforms.calc_handle_time">[docs]</a><span class="k">def</span> <span class="nf">calc_handle_time</span><span class="p">(</span><span class="n">dataframe</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the handle time for a contact. Handle time is calculated as</span>
+<span class="sd">    time elasped between all messages with convo_ind == 1.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataframe (pandas.DataFrame): Input dataframe</span>
+<span class="sd">        parameters (dict): Parameters associated with the transform</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Handle time for the contact, in minutes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">start_convo_time</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;convo_ind&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">][</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    <span class="n">end_convo_time</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;convo_ind&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">][</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">convert_timedelta</span><span class="p">((</span><span class="n">end_convo_time</span><span class="o">-</span><span class="n">start_convo_time</span><span class="p">),</span> <span class="s1">&#39;m&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="calc_response_time"><a class="viewcode-back" href="../../khp.html#khp.transforms.calc_response_time">[docs]</a><span class="k">def</span> <span class="nf">calc_response_time</span><span class="p">(</span><span class="n">dataframe</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the response time for each message. Defined as time elapsed</span>
+<span class="sd">    between message and previous message.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataframe (pandas.DataFrame): Input dataframe</span>
+<span class="sd">        parameters (dict): Parameters associated with the transform</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pandas.Series: Response time for the message</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;prev_message_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">null_check</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;prev_message_time&#39;</span><span class="p">])</span>
+    <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">null_check</span><span class="p">,</span> <span class="s1">&#39;prev_message_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;prev_message_time&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="calc_message_sequence"><a class="viewcode-back" href="../../khp.html#khp.transforms.calc_message_sequence">[docs]</a><span class="k">def</span> <span class="nf">calc_message_sequence</span><span class="p">(</span><span class="n">dataframe</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the message sequence for each message, defined as:</span>
+<span class="sd">    &#39;prev_message_type&#39; - &#39;message_type&#39;, used to indicate whether a message</span>
+<span class="sd">    was from counsellor to counsellor, counselee to counsellor, system to</span>
+<span class="sd">    counsellor etc.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataframe (pandas.DataFrame): Input dataframe</span>
+<span class="sd">        parameters (dict): Parameters associated with the transform</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pandas.Series: Message sequence</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;prev_message_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;message_type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">null_check</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;prev_message_type&#39;</span><span class="p">])</span>
+    <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">null_check</span><span class="p">,</span> <span class="s1">&#39;prev_message_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;message_type&#39;</span><span class="p">]</span>
+    <span class="n">message_seq</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;prev_message_type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> \
+        <span class="o">+</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;message_type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">message_seq</span>
+
+<div class="viewcode-block" id="str_length"><a class="viewcode-back" href="../../khp.html#khp.transforms.str_length">[docs]</a><span class="k">def</span> <span class="nf">str_length</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the length of a string</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataframe (pandas.DataFrame): Input dataframe</span>
+<span class="sd">        parameters (dict): Parameters associated with the transform</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pandas.Series: Number of characters for each row of a column</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+    <span class="k">return</span> <span class="n">dataframe</span><span class="p">[</span><span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;column_name&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">len</span><span class="p">()</span>
+
+<div class="viewcode-block" id="word_count"><a class="viewcode-back" href="../../khp.html#khp.transforms.word_count">[docs]</a><span class="k">def</span> <span class="nf">word_count</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Count the number of words in a string</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataframe (pandas.DataFrame): Input dataframe</span>
+<span class="sd">        parameters (dict): Parameters associated with the transform</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pandas.Series: Word counts for each row of a column</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">str_series</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;column_name&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">str_series</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">()</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">len</span><span class="p">)</span>
 
 <div class="viewcode-block" id="parse_handlers"><a class="viewcode-back" href="../../khp.html#khp.transforms.parse_handlers">[docs]</a><span class="k">def</span> <span class="nf">parse_handlers</span><span class="p">(</span><span class="n">handlers</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Parse the handlers associated with a contact. Split out primary handler</span>
@@ -174,7 +314,7 @@
 <span class="sd">        handlers (list): List of handlers</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        output (dict): Dictionary containing primary and secondary handlers</span>
+<span class="sd">        dict: Dictionary containing primary and secondary handlers</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">output</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">handlers</span><span class="p">:</span> <span class="c1"># no handlers on the call</span>
@@ -189,12 +329,135 @@
 </div>
     <span class="k">return</span> <span class="n">output</span>
 
+<div class="viewcode-block" id="filter_df"><a class="viewcode-back" href="../../khp.html#khp.transforms.filter_df">[docs]</a><span class="k">def</span> <span class="nf">filter_df</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">filters</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Filter a dataframe</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataframe (pandas.DataFrame): Input dataframe</span>
+<span class="sd">        filters (list): list of filters (dicts) to apply</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pandas.DataFrame: Filtered dataframe</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">fltr_dict</span> <span class="ow">in</span> <span class="n">filters</span><span class="p">:</span>
+        <span class="n">fltr_fn</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">fltr_dict</span><span class="p">[</span><span class="s1">&#39;operator&#39;</span><span class="p">])</span>
+        <span class="n">fltr_value</span> <span class="o">=</span> <span class="n">fltr_dict</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+        <span class="n">fltr_value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">builtins</span><span class="p">,</span> <span class="n">fltr_dict</span><span class="p">[</span><span class="s1">&#39;value_type&#39;</span><span class="p">])(</span><span class="n">fltr_value</span><span class="p">)</span>
+        <span class="n">fltr_check</span> <span class="o">=</span> <span class="n">fltr_fn</span><span class="p">(</span><span class="n">dataframe</span><span class="p">[</span><span class="n">fltr_dict</span><span class="p">[</span><span class="s1">&#39;column&#39;</span><span class="p">]],</span> <span class="n">fltr_value</span><span class="p">)</span>
+        <span class="n">fltr_df</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="n">fltr_check</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="n">fltr_df</span>
+
+<div class="viewcode-block" id="row_count"><a class="viewcode-back" href="../../khp.html#khp.transforms.row_count">[docs]</a><span class="k">def</span> <span class="nf">row_count</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Count the number of rows in a dataframe, optionally applying filters</span>
+<span class="sd">    specified in parameters.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataframe (pandas.DataFrame): Input dataframe</span>
+<span class="sd">        parameters (dict): Parameters associated with the transform</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: Number of rows</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s1">&#39;filters&#39;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">fltr_df</span> <span class="o">=</span> <span class="n">filter_df</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;filters&#39;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fltr_df</span> <span class="o">=</span> <span class="n">dataframe</span>
+</div>
+    <span class="k">return</span> <span class="n">fltr_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<div class="viewcode-block" id="column_operator"><a class="viewcode-back" href="../../khp.html#khp.transforms.column_operator">[docs]</a><span class="k">def</span> <span class="nf">column_operator</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Apply a numpy operator on a column in a dataframe, optionally applying</span>
+<span class="sd">    filters specified in parameters.</span>
+
+<span class="sd">    If multiple aggregators are supplied, a dictionary will be returned instead</span>
+<span class="sd">    of the float result. For example, if the following parameters are provided:</span>
+
+<span class="sd">    parameters = {</span>
+<span class="sd">        &#39;output&#39;: khp_response_time,</span>
+<span class="sd">        &#39;aggregator&#39;: [mean, max]</span>
+<span class="sd">    }</span>
+
+<span class="sd">    Function will return:</span>
+
+<span class="sd">    {mean_khp_response_time: 1.2325, max_khp_response_time: 55.212}</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataframe (pandas.DataFrame): Input dataframe</span>
+<span class="sd">        parameters (dict): Parameters associated with the transform</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict or float: If multiple aggregators are supplied, returns a dict</span>
+<span class="sd">            with the result of each aggregator. Otherwise, returns the float</span>
+<span class="sd">            result of the aggregator operation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fltr_df</span> <span class="o">=</span> <span class="n">dataframe</span>
+    <span class="k">if</span> <span class="s1">&#39;filters&#39;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">fltr_df</span> <span class="o">=</span> <span class="n">filter_df</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;filters&#39;</span><span class="p">])</span>
+
+    <span class="n">post_operator</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="s1">&#39;post_operator&#39;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">post</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;post_operator&#39;</span><span class="p">]</span>
+        <span class="n">post_operator</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="vm">__name__</span><span class="p">],</span> <span class="n">post</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+        <span class="n">post_args</span> <span class="o">=</span> <span class="n">post</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;aggregator&#39;</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">agg_name</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;aggregator&#39;</span><span class="p">]:</span>
+            <span class="n">agg</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">np</span><span class="p">,</span> <span class="n">agg_name</span><span class="p">)</span>
+            <span class="n">output_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">agg_name</span><span class="p">,</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">])</span>
+            <span class="n">series</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;column&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">post_operator</span><span class="p">:</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">output_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">post_operator</span><span class="p">(</span><span class="n">agg</span><span class="p">(</span><span class="n">series</span><span class="p">),</span> <span class="n">post_args</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">output_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">agg</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">agg_name</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;aggregator&#39;</span><span class="p">]</span>
+        <span class="n">agg</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">np</span><span class="p">,</span> <span class="n">agg_name</span><span class="p">)</span>
+        <span class="n">series</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;column&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">post_operator</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">post_operator</span><span class="p">(</span><span class="n">agg</span><span class="p">(</span><span class="n">series</span><span class="p">),</span> <span class="n">post_args</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">agg</span><span class="p">(</span><span class="n">series</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">result</span>
+
+<div class="viewcode-block" id="convert_timedelta"><a class="viewcode-back" href="../../khp.html#khp.transforms.convert_timedelta">[docs]</a><span class="k">def</span> <span class="nf">convert_timedelta</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert a timedelta64 object to a float</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        value (numpy.timedelta64[ns]): Timedelta value to convert</span>
+<span class="sd">        unit (TYPE): Datetime unit code, see link for a list of acceptable codes</span>
+<span class="sd">            https://docs.scipy.org/doc/numpy-dev/reference/arrays.datetime.html</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Converted timedelta value</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+    <span class="k">return</span> <span class="n">value</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
+
 <div class="viewcode-block" id="parse_html"><a class="viewcode-back" href="../../khp.html#khp.transforms.parse_html">[docs]</a><span class="k">def</span> <span class="nf">parse_html</span><span class="p">(</span><span class="n">html</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Utilize the beautiful soup html parser to return the text from html</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        html (str): String of html</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: extracted text</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="s1">&#39;html.parser&#39;</span><span class="p">)</span></div>
     <span class="k">return</span> <span class="n">soup</span><span class="o">.</span><span class="n">get_text</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="clean_text"><a class="viewcode-back" href="../../khp.html#khp.transforms.clean_text">[docs]</a><span class="k">def</span> <span class="nf">clean_text</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Function to sanitize the trnascript messages. Replaces all whitespace</span>
+<span class="sd">    with single spaces (since newlines break things when uploading to the DB).</span>
+<span class="sd">    Get rid of everything that isn&#39;t a number, letter, or in a list of</span>
+<span class="sd">    characters to keep.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        text (str): Text string to clean</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Cleaned text str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1">## replace newlines with spaces</span>
     <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
     <span class="n">keep</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;!&#39;</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;[&#39;</span><span class="p">,</span> <span class="s1">&#39;]&#39;</span><span class="p">,</span> <span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;$&#39;</span><span class="p">,</span> <span class="s1">&#39;#&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;:&#39;</span><span class="p">,</span>
@@ -204,6 +467,16 @@
     <span class="k">return</span> <span class="n">text</span>
 
 <div class="viewcode-block" id="parse_message"><a class="viewcode-back" href="../../khp.html#khp.transforms.parse_message">[docs]</a><span class="k">def</span> <span class="nf">parse_message</span><span class="p">(</span><span class="n">message_text</span><span class="p">,</span> <span class="n">is_html</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the text from a (potentially) html message string</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        message_text (str): Description</span>
+<span class="sd">        is_html (bool): Boolean indicator whether the text is html, provided</span>
+<span class="sd">            upstream from the API response.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Parsed message text</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">is_html</span><span class="p">:</span>
         <span class="n">parsed_text</span> <span class="o">=</span> <span class="n">parse_html</span><span class="p">(</span><span class="n">message_text</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -213,15 +486,22 @@
     <span class="k">return</span> <span class="n">parsed_text</span>
 
 <div class="viewcode-block" id="parse_messages"><a class="viewcode-back" href="../../khp.html#khp.transforms.parse_messages">[docs]</a><span class="k">def</span> <span class="nf">parse_messages</span><span class="p">(</span><span class="n">messages</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Transformation function to parse a list of messages</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        messages (list): List of message dicts</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: List of transformed message dicts</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">name_map</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Sender&#39;</span><span class="p">:</span> <span class="s1">&#39;sender&#39;</span><span class="p">,</span> <span class="s1">&#39;Timestamp&#39;</span><span class="p">:</span> <span class="s1">&#39;dt&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;MessageType&#39;</span><span class="p">:</span> <span class="s1">&#39;message_type&#39;</span><span class="p">,</span> <span class="s1">&#39;Message&#39;</span><span class="p">:</span> <span class="s1">&#39;message&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;ContactId&#39;</span><span class="p">:</span> <span class="s1">&#39;contact_id&#39;</span><span class="p">,</span> <span class="s1">&#39;DisplayName&#39;</span><span class="p">:</span> <span class="s1">&#39;display_name&#39;</span><span class="p">}</span>
     <span class="n">output_messages</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">messages</span><span class="p">:</span>
-        <span class="n">transformed</span> <span class="o">=</span> <span class="p">{</span><span class="n">name_map</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">message</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-                        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">name_map</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+        <span class="c1"># remap message dict keys with the name_map specified above</span>
+        <span class="n">transformed</span> <span class="o">=</span> <span class="p">{</span><span class="n">name_map</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">message</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                       <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">name_map</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
         <span class="n">transformed</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">parse_message</span><span class="p">(</span><span class="n">transformed</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">],</span>
                                                <span class="n">message</span><span class="p">[</span><span class="s1">&#39;IsHtml&#39;</span><span class="p">])</span>
         <span class="n">output_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">transformed</span><span class="p">)</span></div>
@@ -229,63 +509,171 @@
 
 
 <div class="viewcode-block" id="Transformer"><a class="viewcode-back" href="../../khp.html#khp.transforms.Transformer">[docs]</a><span class="k">class</span> <span class="nc">Transformer</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;A class that ingests a dictionary of transforms, and runs those</span>
+<span class="sd">    transforms on a supplied dictionary or dataframe.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        transforms (list): List of the transformation dictionaries.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transforms_meta</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">transforms_meta</span> <span class="o">=</span> <span class="n">transforms_meta</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_transforms</span><span class="p">(</span><span class="n">transforms_meta</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;Load and parse the meta transformations data.</span>
 
-
-    <span class="k">def</span> <span class="nf">_get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            transforms_meta (list): List of the raw transformation dictionaries.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">keys</span> <span class="o">=</span> <span class="n">field_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_transforms</span><span class="p">(</span><span class="n">transforms_meta</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Transformer.get_value"><a class="viewcode-back" href="../../khp.html#khp.transforms.Transformer.get_value">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Grab the value associated with a key in a dictionary. Supports the</span>
+<span class="sd">        nested key definitions in transforms.yml. For example, a key of</span>
+<span class="sd">        &#39;KEY1|KEY2|KEY3&#39; will return 5 from the following data:</span>
+
+<span class="sd">        data = {</span>
+<span class="sd">            &#39;KEY1&#39;: {</span>
+<span class="sd">                &#39;KEY2&#39;: {&#39;KEY3&#39;: 5, ...},</span>
+<span class="sd">                ...</span>
+<span class="sd">            },</span>
+<span class="sd">            ...</span>
+<span class="sd">        }</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            key (str): Dictionary key of the value to return</span>
+<span class="sd">            data (dict): Dictionary of data to return value from</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            any type: Returns the value associated with the specified key(s)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)</span></div>
         <span class="k">return</span> <span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">{}),</span> <span class="n">keys</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 
+<div class="viewcode-block" id="Transformer.parse_transforms"><a class="viewcode-back" href="../../khp.html#khp.transforms.Transformer.parse_transforms">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parse_transforms</span><span class="p">(</span><span class="n">transforms_meta</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse the list of raw transformations. Generally, each transformation</span>
+<span class="sd">        (i.e. each element of transforms_meta) will be in the following format:</span>
 
-    <span class="k">def</span> <span class="nf">_parse_transforms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transforms_meta</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        {</span>
+<span class="sd">            &#39;field_name&#39;:</span>
+<span class="sd">                {</span>
+<span class="sd">                    &#39;key1&#39;: &#39;value1&#39;,</span>
+<span class="sd">                    &#39;key2&#39;: &#39;value2&#39;,</span>
+<span class="sd">                    ...</span>
+<span class="sd">                }</span>
+<span class="sd">        }</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            transforms_meta (list): List of the raw transformation dictionaries.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: List of the transformation dictionaries.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">transforms</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">field_dict</span> <span class="ow">in</span> <span class="n">transforms_meta</span><span class="p">:</span>
             <span class="n">field_name</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">field_dict</span><span class="p">))</span>
             <span class="c1"># transforms.yml has special fields reserved by &#39;__XXX__&#39;</span>
+            <span class="c1"># currently not using this functionality</span>
             <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;__.*__&quot;</span><span class="p">,</span> <span class="n">field_name</span><span class="p">):</span>
                 <span class="k">continue</span>
             <span class="n">items</span> <span class="o">=</span> <span class="n">field_dict</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span>
-            <span class="n">transforms</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;field_name&#39;</span><span class="p">:</span> <span class="n">field_name</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="n">items</span><span class="p">})</span>
+            <span class="n">transforms</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">field_name</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="n">items</span><span class="p">})</span></div>
         <span class="k">return</span> <span class="n">transforms</span>
+
+<div class="viewcode-block" id="Transformer.get_input_cols"><a class="viewcode-back" href="../../khp.html#khp.transforms.Transformer.get_input_cols">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_input_cols</span><span class="p">(</span><span class="n">transform_dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the input columns associated with a transformation</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            transform_dict (dict): Transform dict parsed from transforms.yml</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: list of input columns</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">input_cols</span> <span class="o">=</span> <span class="n">transform_dict</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_cols</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">input_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">input_cols</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="n">input_cols</span>
+
+<div class="viewcode-block" id="Transformer.run_df_transforms"><a class="viewcode-back" href="../../khp.html#khp.transforms.Transformer.run_df_transforms">[docs]</a>    <span class="k">def</span> <span class="nf">run_df_transforms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run the transforms on a supplied dataframe.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dataframe (pandas.Dataframe): Input dataframe to run transformation</span>
+<span class="sd">                on.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pandas.Dataframe: Dataframe with updated and/or new columns</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">tform</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span><span class="p">:</span>
+            <span class="n">transform_name</span> <span class="o">=</span> <span class="n">tform</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+            <span class="c1"># input_cols = self.get_input_cols(tform[&#39;items&#39;])</span>
+            <span class="n">parameters</span> <span class="o">=</span> <span class="n">tform</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">]</span>
+            <span class="n">output_name</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span>
+            <span class="n">transform</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="vm">__name__</span><span class="p">],</span> <span class="n">transform_name</span><span class="p">)</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running transform: </span><span class="si">%s</span><span class="s1"> on input dataframe with params </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                     <span class="n">transform_name</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;parameters&#39;</span> <span class="ow">in</span> <span class="n">transform</span><span class="o">.</span><span class="vm">__code__</span><span class="o">.</span><span class="n">co_varnames</span><span class="p">:</span>
+                <span class="n">dataframe</span><span class="p">[</span><span class="n">output_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dataframe</span><span class="p">[</span><span class="n">output_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span>
+</div>
+        <span class="k">return</span> <span class="n">dataframe</span>
+
+<div class="viewcode-block" id="Transformer.run_meta_df_transforms"><a class="viewcode-back" href="../../khp.html#khp.transforms.Transformer.run_meta_df_transforms">[docs]</a>    <span class="k">def</span> <span class="nf">run_meta_df_transforms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run transforms on a supplied dataframe.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dataframe (pandas.Dataframe): Input dataframe to run transformation</span>
+<span class="sd">                on.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Output dictionary from the input dataframe</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">tform</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span><span class="p">:</span>
+            <span class="n">transform_name</span> <span class="o">=</span> <span class="n">tform</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+            <span class="n">parameters</span> <span class="o">=</span> <span class="n">tform</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">]</span>
+            <span class="n">output_name</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span>
+            <span class="n">transform</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="vm">__name__</span><span class="p">],</span> <span class="n">transform_name</span><span class="p">)</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running transform: </span><span class="si">%s</span><span class="s1"> on input dataframe with params </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                     <span class="n">transform_name</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;parameters&#39;</span> <span class="ow">in</span> <span class="n">transform</span><span class="o">.</span><span class="vm">__code__</span><span class="o">.</span><span class="n">co_varnames</span><span class="p">:</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">metadata</span><span class="p">,</span> <span class="o">**</span><span class="n">output</span><span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">metadata</span><span class="p">[</span><span class="n">output_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span></div>
+        <span class="k">return</span> <span class="n">metadata</span>
 
 <div class="viewcode-block" id="Transformer.run_transforms"><a class="viewcode-back" href="../../khp.html#khp.transforms.Transformer.run_transforms">[docs]</a>    <span class="k">def</span> <span class="nf">run_transforms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Run the transforms on a supplied dictionary of data.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            data (dict):</span>
+<span class="sd">            data (dict): dictionary of data to run transformation on</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            transformed (list or dict): data that has been parsed, re-mapped and</span>
+<span class="sd">            (list or dict): data that has been parsed, re-mapped and</span>
 <span class="sd">                transformed according to the self.transforms instructions</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">transformed</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">transform</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span><span class="p">:</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_value</span><span class="p">(</span><span class="n">transform</span><span class="p">[</span><span class="s1">&#39;field_name&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">transform</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">)</span>
             <span class="n">items</span> <span class="o">=</span> <span class="n">transform</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">]</span>
             <span class="k">if</span> <span class="s2">&quot;transform&quot;</span> <span class="ow">in</span> <span class="n">items</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="vm">__name__</span><span class="p">],</span> <span class="n">items</span><span class="p">[</span><span class="s2">&quot;transform&quot;</span><span class="p">])(</span>
-                        <span class="n">value</span><span class="p">)</span>
+                <span class="n">func_name</span> <span class="o">=</span> <span class="n">items</span><span class="p">[</span><span class="s2">&quot;transform&quot;</span><span class="p">]</span>
+                <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running transform: </span><span class="si">%s</span><span class="s1"> on data&#39;</span><span class="p">,</span> <span class="n">func_name</span><span class="p">)</span>
+                <span class="n">tform_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="vm">__name__</span><span class="p">],</span> <span class="n">func_name</span><span class="p">)</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">tform_func</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
             <span class="c1"># Some transforms may return two fields, i.e. {&#39;a&#39;: 5, &#39;b&#39;: 10}</span>
-            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
                 <span class="n">transformed</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">transformed</span><span class="p">,</span> <span class="o">**</span><span class="n">value</span><span class="p">}</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">transformed</span><span class="p">[</span><span class="n">items</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">value</span>
 </div></div>
         <span class="k">return</span> <span class="n">transformed</span>
-
-<span class="c1">#TODO: add logging</span>
 </pre></div>
 
            </div>

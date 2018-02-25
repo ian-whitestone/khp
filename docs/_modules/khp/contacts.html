@@ -164,6 +164,7 @@
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">timedelta</span><span class="p">,</span> <span class="n">datetime</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">postgrez</span>
 <span class="kn">from</span> <span class="nn">khp</span> <span class="k">import</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">khp</span> <span class="k">import</span> <span class="n">config</span>
@@ -289,7 +290,7 @@
 
 
     <span class="n">transcript</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">read_jason</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-    <span class="n">transforms_meta</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">TRANSFORMS</span><span class="p">[</span><span class="s2">&quot;transcript&quot;</span><span class="p">]</span>
+    <span class="n">transforms_meta</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">TRANSFORMS</span><span class="p">[</span><span class="s2">&quot;recording&quot;</span><span class="p">]</span>
     <span class="n">optimus</span> <span class="o">=</span> <span class="n">Transformer</span><span class="p">(</span><span class="n">transforms_meta</span><span class="p">)</span>
     <span class="n">output</span> <span class="o">=</span> <span class="n">optimus</span><span class="o">.</span><span class="n">run_transforms</span><span class="p">(</span><span class="n">transcript</span><span class="p">)</span>
     <span class="n">messages</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s1">&#39;messages&#39;</span><span class="p">]</span>
@@ -339,10 +340,74 @@
     <span class="n">to_load</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">:</span>
         <span class="n">basename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-        <span class="n">contact_id</span> <span class="o">=</span> <span class="n">basename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_data.txt&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">contact_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">basename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_data.txt&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">contact_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">loaded_contacts</span><span class="p">:</span>
-            <span class="n">to_load</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">basename</span><span class="p">)</span></div>
+            <span class="n">to_load</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">basename</span><span class="p">)</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> transcripts to parse and load&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">to_load</span><span class="p">))</span></div>
     <span class="k">return</span> <span class="n">to_load</span>
+
+<div class="viewcode-block" id="load_transcripts_df"><a class="viewcode-back" href="../../khp.html#khp.contacts.load_transcripts_df">[docs]</a><span class="k">def</span> <span class="nf">load_transcripts_df</span><span class="p">(</span><span class="n">contact_ids</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Load the transcripts data associated with a set of contact_ids into</span>
+<span class="sd">    a pandas Dataframe.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        contact_ids (list): List of contact ids to load</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pandas.Dataframe: Dataframe containing the loaded transcripts</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading transcripts for contact_ids: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">contact_ids</span><span class="p">)</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        SELECT * FROM transcripts WHERE contact_id IN (</span><span class="si">{}</span><span class="s2">)</span>
+<span class="s2">        ORDER BY contact_id, dt ASC</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">contact_ids</span><span class="p">]))</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">postgrez</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">DB_CONF</span><span class="p">[</span><span class="s1">&#39;host&#39;</span><span class="p">],</span> <span class="n">user</span><span class="o">=</span><span class="n">DB_CONF</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">],</span>
+                            <span class="n">password</span><span class="o">=</span><span class="n">DB_CONF</span><span class="p">[</span><span class="s1">&#39;pwd&#39;</span><span class="p">],</span> <span class="n">database</span><span class="o">=</span><span class="n">DB_CONF</span><span class="p">[</span><span class="s1">&#39;db&#39;</span><span class="p">])</span>
+    <span class="n">dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">dataframe</span>
+
+<div class="viewcode-block" id="load_enhanced_transcript"><a class="viewcode-back" href="../../khp.html#khp.contacts.load_enhanced_transcript">[docs]</a><span class="k">def</span> <span class="nf">load_enhanced_transcript</span><span class="p">(</span><span class="n">contact_id</span><span class="p">,</span> <span class="n">summary</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Load the transcript summary dictionary to the enhanced_transcripts table</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        contact_id (int): contact id</span>
+<span class="sd">        summary (dict): Summary dict of the transcript</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">load_data</span> <span class="o">=</span> <span class="p">[[</span><span class="n">contact_id</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">summary</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">]]</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;contact_id&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">columns</span>
+
+    <span class="n">postgrez</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;enhanced_transcripts&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">load_data</span><span class="p">,</span>
+                  <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">DB_CONF</span><span class="p">[</span><span class="s1">&#39;host&#39;</span><span class="p">],</span> <span class="n">user</span><span class="o">=</span><span class="n">DB_CONF</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">],</span></div>
+                  <span class="n">password</span><span class="o">=</span><span class="n">DB_CONF</span><span class="p">[</span><span class="s1">&#39;pwd&#39;</span><span class="p">],</span> <span class="n">database</span><span class="o">=</span><span class="n">DB_CONF</span><span class="p">[</span><span class="s1">&#39;db&#39;</span><span class="p">])</span>
+
+<div class="viewcode-block" id="enhanced_transcripts"><a class="viewcode-back" href="../../khp.html#khp.contacts.enhanced_transcripts">[docs]</a><span class="k">def</span> <span class="nf">enhanced_transcripts</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Read in un-processed transcripts from Postgres, perform a series of</span>
+<span class="sd">    operations to produce metadata per contact_id, load into table</span>
+<span class="sd">    enhanced_transcripts</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        SELECT contact_id FROM transcripts WHERE contact_id NOT IN</span>
+<span class="s2">        (SELECT contact_id FROM enhanced_transcripts)</span>
+<span class="s2">        GROUP BY 1</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">postgrez</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">DB_CONF</span><span class="p">[</span><span class="s1">&#39;host&#39;</span><span class="p">],</span> <span class="n">user</span><span class="o">=</span><span class="n">DB_CONF</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">],</span>
+                            <span class="n">password</span><span class="o">=</span><span class="n">DB_CONF</span><span class="p">[</span><span class="s1">&#39;pwd&#39;</span><span class="p">],</span> <span class="n">database</span><span class="o">=</span><span class="n">DB_CONF</span><span class="p">[</span><span class="s1">&#39;db&#39;</span><span class="p">])</span>
+    <span class="n">to_load</span> <span class="o">=</span> <span class="p">[</span><span class="n">record</span><span class="p">[</span><span class="s1">&#39;contact_id&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+
+    <span class="n">transcripts_tforms</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">TRANSFORMS</span><span class="p">[</span><span class="s2">&quot;transcripts&quot;</span><span class="p">]</span>
+    <span class="n">transcripts_meta_tforms</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">TRANSFORMS</span><span class="p">[</span><span class="s1">&#39;transcript_summary&#39;</span><span class="p">]</span>
+    <span class="n">optimus</span> <span class="o">=</span> <span class="n">Transformer</span><span class="p">(</span><span class="n">transcripts_tforms</span><span class="p">)</span>
+    <span class="n">megatron</span> <span class="o">=</span> <span class="n">Transformer</span><span class="p">(</span><span class="n">transcripts_meta_tforms</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">contact_id</span> <span class="ow">in</span> <span class="n">to_load</span><span class="p">:</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Processing transcript for contact_id </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">contact_id</span><span class="p">)</span>
+        <span class="n">dataframe</span> <span class="o">=</span> <span class="n">load_transcripts_df</span><span class="p">([</span><span class="n">contact_id</span><span class="p">])</span>
+        <span class="n">dataframe</span> <span class="o">=</span> <span class="n">optimus</span><span class="o">.</span><span class="n">run_df_transforms</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span>
+        <span class="n">summary</span> <span class="o">=</span> <span class="n">megatron</span><span class="o">.</span><span class="n">run_meta_df_transforms</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span>
+        <span class="n">load_enhanced_transcript</span><span class="p">(</span><span class="n">contact_id</span><span class="p">,</span> <span class="n">summary</span><span class="p">)</span></div>
+    <span class="k">return</span>
 
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../../khp.html#khp.contacts.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">interaction_type</span><span class="o">=</span><span class="s1">&#39;IM&#39;</span><span class="p">,</span> <span class="n">start_date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end_date</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">config</span><span class="o">.</span><span class="n">log_ascii</span><span class="p">()</span>
@@ -371,10 +436,6 @@
     <span class="k">for</span> <span class="n">transcript_file</span> <span class="ow">in</span> <span class="n">transcripts_to_load</span><span class="p">:</span>
         <span class="n">full_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">ICESCAPE_OUTPUT_DIR</span><span class="p">,</span> <span class="n">transcript_file</span><span class="p">)</span></div>
         <span class="n">parse_transcript</span><span class="p">(</span><span class="n">full_path</span><span class="p">)</span>
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="c1"># main(&quot;IM&quot;, &#39;2018-02-10&#39;, &#39;2018-02-17&#39;)</span>
-    <span class="n">main</span><span class="p">()</span>
 </pre></div>
 
            </div>
