@@ -191,9 +191,9 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        interaction_type (str): Type of contact (i.e. IM, Voice, Email)</span>
-<span class="sd">        start_date (str, optional): Start time, `YYYY-mm-dd`. Defaults to</span>
+<span class="sd">        start_date (:obj:`str`, optional): Start time, `YYYY-mm-dd`. Defaults to</span>
 <span class="sd">            beginning of yesterday.</span>
-<span class="sd">        start_date (str, optional): End time, `YYYY-mm-dd`. Defaults to</span>
+<span class="sd">        start_date (:obj:`str`, optional): End time, `YYYY-mm-dd`. Defaults to</span>
 <span class="sd">            end of yesterday.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ice</span> <span class="o">=</span> <span class="n">Icescape</span><span class="p">()</span>
@@ -213,16 +213,16 @@
         <span class="n">contact_data</span> <span class="o">=</span> <span class="n">ice</span><span class="o">.</span><span class="n">get_contacts</span><span class="p">(</span><span class="n">interaction_type</span><span class="p">)</span>
         <span class="n">start_dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">_contacts.txt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">interaction_type</span><span class="p">,</span>
-                        <span class="n">start_dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">))</span></div>
+                                               <span class="n">start_dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">))</span></div>
         <span class="n">save_data</span><span class="p">(</span><span class="n">contact_data</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
 
 <div class="viewcode-block" id="download_transcripts"><a class="viewcode-back" href="../../khp.html#khp.contacts.download_transcripts">[docs]</a><span class="k">def</span> <span class="nf">download_transcripts</span><span class="p">(</span><span class="n">contact_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Download transcripts for a list of contact_ids.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        contact_ids (list, optional): List of Contact IDs to retrieve recordings</span>
-<span class="sd">            for. If None are provided (default), queries contacts that have not</span>
-<span class="sd">            been parsed</span>
+<span class="sd">        contact_ids (:obj:`list`, optional): List of Contact IDs to retrieve</span>
+<span class="sd">            recordings for. If None are provided (default), queries contacts</span>
+<span class="sd">            that have not been parsed</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">contact_ids</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
@@ -259,6 +259,15 @@
                          <span class="n">database</span><span class="o">=</span><span class="n">DB_CONF</span><span class="p">[</span><span class="s1">&#39;db&#39;</span><span class="p">])</span>
 
 <div class="viewcode-block" id="parse_contacts_file"><a class="viewcode-back" href="../../khp.html#khp.contacts.parse_contacts_file">[docs]</a><span class="k">def</span> <span class="nf">parse_contacts_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parse the JSON contacts file downloaded from Icescape. Parsing includes:</span>
+
+<span class="sd">    * Reading JSON file into python object</span>
+<span class="sd">    * Running transformations on each contact dict in the contacts file</span>
+<span class="sd">    * Uploading parsed/transformed contact dicts into Postgres</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filename (str): Full path of the contacts file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Parsing contact file </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
     <span class="n">base_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
     <span class="n">interaction_type</span> <span class="o">=</span> <span class="n">base_file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -286,8 +295,16 @@
                   <span class="n">password</span><span class="o">=</span><span class="n">DB_CONF</span><span class="p">[</span><span class="s1">&#39;pwd&#39;</span><span class="p">],</span> <span class="n">database</span><span class="o">=</span><span class="n">DB_CONF</span><span class="p">[</span><span class="s1">&#39;db&#39;</span><span class="p">])</span>
 
 <div class="viewcode-block" id="parse_transcript"><a class="viewcode-back" href="../../khp.html#khp.contacts.parse_transcript">[docs]</a><span class="k">def</span> <span class="nf">parse_transcript</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Parsing transcript file </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;Parse the transcript file downloaded from Icescape. Parsing includes:</span>
 
+<span class="sd">    * Reading JSON file into python object</span>
+<span class="sd">    * Running transformations on the raw transcript</span>
+<span class="sd">    * Uploading parsed/transformed cmessages into Postgres</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filename (str): Full path of the transcript file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Parsing transcript file </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
 
     <span class="n">transcript</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">read_jason</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
     <span class="n">transforms_meta</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">TRANSFORMS</span><span class="p">[</span><span class="s2">&quot;recording&quot;</span><span class="p">]</span>
@@ -410,6 +427,15 @@
     <span class="k">return</span>
 
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../../khp.html#khp.contacts.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">interaction_type</span><span class="o">=</span><span class="s1">&#39;IM&#39;</span><span class="p">,</span> <span class="n">start_date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end_date</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Run the full contacts pipeline.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        interaction_type (:obj:`str`, optional): Type of contact (i.e. IM,</span>
+<span class="sd">            Voice, Email)</span>
+<span class="sd">        start_date (:obj:`str`, optional): Start date, format YYYY-mm-dd</span>
+<span class="sd">        end_date (:obj:`str`, optional): End date, format YYYY-mm-dd</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">config</span><span class="o">.</span><span class="n">log_ascii</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">start_date</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">end_date</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">yesterday</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -429,13 +455,20 @@
         <span class="n">full_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">ICESCAPE_OUTPUT_DIR</span><span class="p">,</span> <span class="n">contact_file</span><span class="p">)</span>
         <span class="n">parse_contacts_file</span><span class="p">(</span><span class="n">full_path</span><span class="p">)</span>
 
+    <span class="k">if</span> <span class="n">interaction_type</span> <span class="o">!=</span> <span class="s1">&#39;IM&#39;</span><span class="p">:</span>
+        <span class="k">return</span>
+
     <span class="c1">## DOWNLOAD TRANSCRIPTS ##</span>
     <span class="n">download_transcripts</span><span class="p">()</span>
+
     <span class="c1">## TRANSCRIPTS LOADING ##</span>
     <span class="n">transcripts_to_load</span> <span class="o">=</span> <span class="n">get_transcripts_to_load</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">transcript_file</span> <span class="ow">in</span> <span class="n">transcripts_to_load</span><span class="p">:</span>
-        <span class="n">full_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">ICESCAPE_OUTPUT_DIR</span><span class="p">,</span> <span class="n">transcript_file</span><span class="p">)</span></div>
+        <span class="n">full_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">ICESCAPE_OUTPUT_DIR</span><span class="p">,</span> <span class="n">transcript_file</span><span class="p">)</span>
         <span class="n">parse_transcript</span><span class="p">(</span><span class="n">full_path</span><span class="p">)</span>
+
+    <span class="c1">## ENHANCED TRANSCRIPTS ##</span></div>
+    <span class="n">enhanced_transcripts</span><span class="p">()</span>
 </pre></div>
 
            </div>

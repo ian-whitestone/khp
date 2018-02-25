@@ -29,9 +29,9 @@ def download_contacts(interaction_type, start_date=None, end_date=None):
 
     Args:
         interaction_type (str): Type of contact (i.e. IM, Voice, Email)
-        start_date (str, optional): Start time, `YYYY-mm-dd`. Defaults to
+        start_date (:obj:`str`, optional): Start time, `YYYY-mm-dd`. Defaults to
             beginning of yesterday.
-        start_date (str, optional): End time, `YYYY-mm-dd`. Defaults to
+        start_date (:obj:`str`, optional): End time, `YYYY-mm-dd`. Defaults to
             end of yesterday.
     """
     ice = Icescape()
@@ -51,16 +51,16 @@ def download_contacts(interaction_type, start_date=None, end_date=None):
         contact_data = ice.get_contacts(interaction_type)
         start_dt = datetime.now() - timedelta(1)
         filename = "{}_{}_contacts.txt".format(interaction_type,
-                        start_dt.strftime("%Y-%m-%d"))
+                                               start_dt.strftime("%Y-%m-%d"))
         save_data(contact_data, filename)
 
 def download_transcripts(contact_ids=None):
     """Download transcripts for a list of contact_ids.
 
     Args:
-        contact_ids (list, optional): List of Contact IDs to retrieve recordings
-            for. If None are provided (default), queries contacts that have not
-            been parsed
+        contact_ids (:obj:`list`, optional): List of Contact IDs to retrieve
+            recordings for. If None are provided (default), queries contacts
+            that have not been parsed
     """
     if contact_ids is None:
         query = """
@@ -97,6 +97,15 @@ def download_transcripts(contact_ids=None):
                          database=DB_CONF['db'])
 
 def parse_contacts_file(filename):
+    """Parse the JSON contacts file downloaded from Icescape. Parsing includes:
+
+    * Reading JSON file into python object
+    * Running transformations on each contact dict in the contacts file
+    * Uploading parsed/transformed contact dicts into Postgres
+
+    Args:
+        filename (str): Full path of the contacts file
+    """
     LOG.info("Parsing contact file %s", filename)
     base_file = os.path.basename(filename)
     interaction_type = base_file.split('_')[0]
@@ -124,8 +133,16 @@ def parse_contacts_file(filename):
                   password=DB_CONF['pwd'], database=DB_CONF['db'])
 
 def parse_transcript(filename):
-    LOG.info("Parsing transcript file %s", filename)
+    """Parse the transcript file downloaded from Icescape. Parsing includes:
 
+    * Reading JSON file into python object
+    * Running transformations on the raw transcript
+    * Uploading parsed/transformed cmessages into Postgres
+
+    Args:
+        filename (str): Full path of the transcript file
+    """
+    LOG.info("Parsing transcript file %s", filename)
 
     transcript = utils.read_jason(filename)
     transforms_meta = config.TRANSFORMS["recording"]
@@ -248,6 +265,15 @@ def enhanced_transcripts():
     return
 
 def main(interaction_type='IM', start_date=None, end_date=None):
+    """Run the full contacts pipeline.
+
+    Args:
+        interaction_type (:obj:`str`, optional): Type of contact (i.e. IM,
+            Voice, Email)
+        start_date (:obj:`str`, optional): Start date, format YYYY-mm-dd
+        end_date (:obj:`str`, optional): End date, format YYYY-mm-dd
+
+    """
     config.log_ascii()
     if start_date is None and end_date is None:
         yesterday = datetime.today() - timedelta(1)
@@ -267,10 +293,17 @@ def main(interaction_type='IM', start_date=None, end_date=None):
         full_path = os.path.join(config.ICESCAPE_OUTPUT_DIR, contact_file)
         parse_contacts_file(full_path)
 
+    if interaction_type != 'IM':
+        return
+
     ## DOWNLOAD TRANSCRIPTS ##
     download_transcripts()
+
     ## TRANSCRIPTS LOADING ##
     transcripts_to_load = get_transcripts_to_load()
     for transcript_file in transcripts_to_load:
         full_path = os.path.join(config.ICESCAPE_OUTPUT_DIR, transcript_file)
         parse_transcript(full_path)
+
+    ## ENHANCED TRANSCRIPTS ##
+    enhanced_transcripts()

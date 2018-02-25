@@ -210,23 +210,28 @@ def column_operator(dataframe, parameters):
     If multiple aggregators are supplied, a dictionary will be returned instead
     of the float result. For example, if the following parameters are provided:
 
-    parameters = {
-        'output': khp_response_time,
-        'aggregator': [mean, max]
-    }
+    .. code-block:: python
+       :emphasize-lines: 3
+
+        parameters = {
+            'output': khp_response_time,
+            'aggregator': [mean, max]
+        }
 
     Function will return:
 
-    {mean_khp_response_time: 1.2325, max_khp_response_time: 55.212}
+    .. code-block:: python
+
+        {mean_khp_response_time: 1.2325, max_khp_response_time: 55.212}
 
     Args:
         dataframe (pandas.DataFrame): Input dataframe
         parameters (dict): Parameters associated with the transform
 
     Returns:
-        dict or float: If multiple aggregators are supplied, returns a dict
-            with the result of each aggregator. Otherwise, returns the float
-            result of the aggregator operation.
+        dict or float: aggregator operation output. If multiple aggregators are supplied, returns a dict with the result of
+        each aggregator. Otherwise, returns the float result of the
+        aggregator operation.
     """
     fltr_df = dataframe
     if 'filters' in parameters.keys():
@@ -368,20 +373,26 @@ class Transformer():
         nested key definitions in transforms.yml. For example, a key of
         'KEY1|KEY2|KEY3' will return 5 from the following data:
 
-        data = {
-            'KEY1': {
-                'KEY2': {'KEY3': 5, ...},
+        .. code-block:: python
+           :emphasize-lines: 4
+
+            data = {
+                'KEY1': {
+                    'KEY2': {
+                        'KEY3': 5,
+                        ...
+                        },
+                    ...
+                },
                 ...
-            },
-            ...
-        }
+            }
 
         Args:
             key (str): Dictionary key of the value to return
             data (dict): Dictionary of data to return value from
 
         Returns:
-            any type: Returns the value associated with the specified key(s)
+            Returns the value associated with the specified key(s)
         """
         keys = key.split('|')
         return reduce(lambda c, k: c.get(k, {}), keys, data)

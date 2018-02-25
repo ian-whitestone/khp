@@ -199,8 +199,8 @@
 <span class="sd">        end_date (str): End date, `YYYY-mm-dd`</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        date_range (list): List of dates, as datetime.datetime objects, between</span>
-<span class="sd">            start_date and end_date</span>
+<span class="sd">        list: List of dates, as datetime.datetime objects, between start_date</span>
+<span class="sd">            and end_date</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">pandas_range</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">))</span></div>
     <span class="k">return</span> <span class="p">[</span><span class="n">dt</span><span class="o">.</span><span class="n">to_pydatetime</span><span class="p">()</span> <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">pandas_range</span><span class="p">]</span>
@@ -212,7 +212,7 @@
 <span class="sd">        filename (str): path of the file</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        data (list or dict): parsed data from the file</span>
+<span class="sd">        list or dict: parsed data from the file</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
@@ -233,8 +233,8 @@
     <span class="sd">&quot;&quot;&quot;Generate yesterdays date range, in datetime objects</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        start (datetime.datetime): Beginning of yesterday</span>
-<span class="sd">        end (datetime.datetime): End of yesterday</span>
+<span class="sd">        datetime.datetime: Beginning of yesterday</span>
+<span class="sd">        datetime.datetime: End of yesterday</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">yesterday</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">start</span> <span class="o">=</span> <span class="n">yesterday</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">hour</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">second</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">microsecond</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -270,7 +270,7 @@
 <span class="sd">            behaviour (i.e. how str_dt&#39;s like `2018` or `2` are handled)</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        dt (datetime.datetime): Datetime object</span>
+<span class="sd">        datetime.datetime: Datetime object</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Parsing &#39;</span><span class="si">{}</span><span class="s2">&#39; into datetime object&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">str_dt</span><span class="p">))</span>
     <span class="k">try</span><span class="p">:</span>
@@ -290,7 +290,7 @@
 <span class="sd">        tz1 (str): pytz acceptable timezone to conver to</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        dt2 (datetime.datetime): Datetime object in timezone 2</span>
+<span class="sd">        datetime.datetime: Datetime object in timezone 2</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Converting &#39;</span><span class="si">{}</span><span class="s2">&#39; from timezone: &#39;</span><span class="si">{}</span><span class="s2">&#39; to timezone &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">dt</span><span class="p">,</span> <span class="n">tz1</span><span class="p">,</span> <span class="n">tz2</span><span class="p">))</span>
@@ -311,7 +311,7 @@
 <span class="sd">        yaml_file (str): Full path of the yaml file.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        data (dict): Dictionary of yaml_file contents.</span>
+<span class="sd">        dict: Dictionary of yaml_file contents.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        Exception: If the yaml_file cannot be opened.</span>
@@ -333,8 +333,8 @@
 <span class="sd">    Args:</span>
 <span class="sd">        s3_bucket (str): Name of the S3 bucket.</span>
 <span class="sd">        files (list): List of files to upload</span>
-<span class="sd">        encrypt (bool, optional): Use serverside AES256 encryption, defaults to</span>
-<span class="sd">            True.</span>
+<span class="sd">        encrypt (:obj:`bool`, optional): Use serverside AES256 encryption,</span>
+<span class="sd">            defaults to True.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Attempting to load </span><span class="si">{0}</span><span class="s2"> files to s3 bucket: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
              <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">),</span> <span class="n">s3_bucket</span><span class="p">))</span>
@@ -353,9 +353,9 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        s3_bucket (str): Name of the S3 bucket.</span>
-<span class="sd">        prefix (str, optional): File prefix. Defaults to None.</span>
+<span class="sd">        prefix (:obj:`str`, optional): File prefix. Defaults to None.</span>
 <span class="sd">    Returns:</span>
-<span class="sd">        keys (list): List of keys in the S3 bucket.</span>
+<span class="sd">        list: List of keys in the S3 bucket.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">keys</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">s3</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s1">&#39;s3&#39;</span><span class="p">)</span>
@@ -379,7 +379,7 @@
 <span class="sd">        key (str): Name of the S3 object</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        contents (str): Contents of S3 object</span>
+<span class="sd">        str: Contents of S3 object</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reading </span><span class="si">{0}</span><span class="s2"> from S3 bucket: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">s3_bucket</span><span class="p">))</span>
     <span class="n">s3</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="s1">&#39;s3&#39;</span><span class="p">)</span>
@@ -394,14 +394,13 @@
 <span class="sd">    Args:</span>
 <span class="sd">        contents (str): contents of an S3 object</span>
 <span class="sd">        delimiter (str): delimiter to split the contents of each line with</span>
-<span class="sd">        remove_dupes (bool, optional): ensure each line is unique. Defaults to</span>
-<span class="sd">            False.</span>
-<span class="sd">        skip_first_line (bool, optional): skip the first line of the S3 object.</span>
+<span class="sd">        remove_dupes (:obj:`bool`, optional): ensure each line is unique.</span>
 <span class="sd">            Defaults to False.</span>
+<span class="sd">        skip_first_line (:obj:`bool`, optional): skip the first line of the S3</span>
+<span class="sd">            object. Defaults to False.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        parsed_contents (list): List of lists, where each tuple is the contents</span>
-<span class="sd">            of a single line.</span>
+<span class="sd">        list: List of lists, where each tuple is the contents of a single line.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">contents</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">line</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">remove_dupes</span><span class="p">:</span>
@@ -419,10 +418,10 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        path (str): input path</span>
-<span class="sd">        like (list, optional): List of file regexes to match files on</span>
+<span class="sd">        like (:obj:`list`, optional): List of file regexes to match files on</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        files (list): list of files matching the specified filetypes</span>
+<span class="sd">        list: list of files matching the specified filetypes</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Searching for files in </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span>
@@ -446,7 +445,7 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        path (str): input path</span>
-<span class="sd">        prefix (str, optional): File prefix</span>
+<span class="sd">        prefix (:obj:`str`, optional): File prefix</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Cleaning folders in </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span>

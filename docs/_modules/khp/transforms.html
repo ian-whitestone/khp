@@ -372,23 +372,28 @@
 <span class="sd">    If multiple aggregators are supplied, a dictionary will be returned instead</span>
 <span class="sd">    of the float result. For example, if the following parameters are provided:</span>
 
-<span class="sd">    parameters = {</span>
-<span class="sd">        &#39;output&#39;: khp_response_time,</span>
-<span class="sd">        &#39;aggregator&#39;: [mean, max]</span>
-<span class="sd">    }</span>
+<span class="sd">    .. code-block:: python</span>
+<span class="sd">       :emphasize-lines: 3</span>
+
+<span class="sd">        parameters = {</span>
+<span class="sd">            &#39;output&#39;: khp_response_time,</span>
+<span class="sd">            &#39;aggregator&#39;: [mean, max]</span>
+<span class="sd">        }</span>
 
 <span class="sd">    Function will return:</span>
 
-<span class="sd">    {mean_khp_response_time: 1.2325, max_khp_response_time: 55.212}</span>
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        {mean_khp_response_time: 1.2325, max_khp_response_time: 55.212}</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        dataframe (pandas.DataFrame): Input dataframe</span>
 <span class="sd">        parameters (dict): Parameters associated with the transform</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        dict or float: If multiple aggregators are supplied, returns a dict</span>
-<span class="sd">            with the result of each aggregator. Otherwise, returns the float</span>
-<span class="sd">            result of the aggregator operation.</span>
+<span class="sd">        dict or float: aggregator operation output. If multiple aggregators are supplied, returns a dict with the result of</span>
+<span class="sd">        each aggregator. Otherwise, returns the float result of the</span>
+<span class="sd">        aggregator operation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">fltr_df</span> <span class="o">=</span> <span class="n">dataframe</span>
     <span class="k">if</span> <span class="s1">&#39;filters&#39;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -530,20 +535,26 @@
 <span class="sd">        nested key definitions in transforms.yml. For example, a key of</span>
 <span class="sd">        &#39;KEY1|KEY2|KEY3&#39; will return 5 from the following data:</span>
 
-<span class="sd">        data = {</span>
-<span class="sd">            &#39;KEY1&#39;: {</span>
-<span class="sd">                &#39;KEY2&#39;: {&#39;KEY3&#39;: 5, ...},</span>
+<span class="sd">        .. code-block:: python</span>
+<span class="sd">           :emphasize-lines: 4</span>
+
+<span class="sd">            data = {</span>
+<span class="sd">                &#39;KEY1&#39;: {</span>
+<span class="sd">                    &#39;KEY2&#39;: {</span>
+<span class="sd">                        &#39;KEY3&#39;: 5,</span>
+<span class="sd">                        ...</span>
+<span class="sd">                        },</span>
+<span class="sd">                    ...</span>
+<span class="sd">                },</span>
 <span class="sd">                ...</span>
-<span class="sd">            },</span>
-<span class="sd">            ...</span>
-<span class="sd">        }</span>
+<span class="sd">            }</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            key (str): Dictionary key of the value to return</span>
 <span class="sd">            data (dict): Dictionary of data to return value from</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            any type: Returns the value associated with the specified key(s)</span>
+<span class="sd">            Returns the value associated with the specified key(s)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">keys</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)</span></div>
         <span class="k">return</span> <span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">{}),</span> <span class="n">keys</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>

@@ -37,8 +37,8 @@ def generate_date_range(start_date, end_date):
         end_date (str): End date, `YYYY-mm-dd`
 
     Returns:
-        date_range (list): List of dates, as datetime.datetime objects, between
-            start_date and end_date
+        list: List of dates, as datetime.datetime objects, between start_date
+            and end_date
     """
     pandas_range = list(pd.date_range(start_date, end_date))
     return [dt.to_pydatetime() for dt in pandas_range]
@@ -50,7 +50,7 @@ def read_jason(filename):
         filename (str): path of the file
 
     Returns:
-        data (list or dict): parsed data from the file
+        list or dict: parsed data from the file
     """
     with open(filename, "r") as f:
         content = f.read()
@@ -71,8 +71,8 @@ def yesterdays_range():
     """Generate yesterdays date range, in datetime objects
 
     Returns:
-        start (datetime.datetime): Beginning of yesterday
-        end (datetime.datetime): End of yesterday
+        datetime.datetime: Beginning of yesterday
+        datetime.datetime: End of yesterday
     """
     yesterday = datetime.now() - timedelta(1)
     start = yesterday.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -108,7 +108,7 @@ def parse_date(str_dt):
             behaviour (i.e. how str_dt's like `2018` or `2` are handled)
 
     Returns:
-        dt (datetime.datetime): Datetime object
+        datetime.datetime: Datetime object
     """
     LOG.info("Parsing '{}' into datetime object".format(str_dt))
     try:
@@ -128,7 +128,7 @@ def convert_timezone(dt, tz1, tz2):
         tz1 (str): pytz acceptable timezone to conver to
 
     Returns:
-        dt2 (datetime.datetime): Datetime object in timezone 2
+        datetime.datetime: Datetime object in timezone 2
     """
     LOG.info("Converting '{}' from timezone: '{}' to timezone '{}'".format(
                 dt, tz1, tz2))
@@ -149,7 +149,7 @@ def read_yaml(yaml_file):
         yaml_file (str): Full path of the yaml file.
 
     Returns:
-        data (dict): Dictionary of yaml_file contents.
+        dict: Dictionary of yaml_file contents.
 
     Raises:
         Exception: If the yaml_file cannot be opened.
@@ -171,8 +171,8 @@ def upload_to_s3(s3_bucket, files, encrypt=True):
     Args:
         s3_bucket (str): Name of the S3 bucket.
         files (list): List of files to upload
-        encrypt (bool, optional): Use serverside AES256 encryption, defaults to
-            True.
+        encrypt (:obj:`bool`, optional): Use serverside AES256 encryption,
+            defaults to True.
     """
     LOG.info("Attempting to load {0} files to s3 bucket: {1}".format(
              len(files), s3_bucket))
@@ -191,9 +191,9 @@ def get_s3_keys(s3_bucket, prefix=None):
 
     Args:
         s3_bucket (str): Name of the S3 bucket.
-        prefix (str, optional): File prefix. Defaults to None.
+        prefix (:obj:`str`, optional): File prefix. Defaults to None.
     Returns:
-        keys (list): List of keys in the S3 bucket.
+        list: List of keys in the S3 bucket.
     """
     keys = []
     s3 = boto3.client('s3')
@@ -217,7 +217,7 @@ def read_s3_file(s3_bucket, key):
         key (str): Name of the S3 object
 
     Returns:
-        contents (str): Contents of S3 object
+        str: Contents of S3 object
     """
     LOG.info("Reading {0} from S3 bucket: {1}".format(key, s3_bucket))
     s3 = boto3.resource('s3')
@@ -232,14 +232,13 @@ def parse_s3_contents(contents, delimiter, remove_dupes=False,
     Args:
         contents (str): contents of an S3 object
         delimiter (str): delimiter to split the contents of each line with
-        remove_dupes (bool, optional): ensure each line is unique. Defaults to
-            False.
-        skip_first_line (bool, optional): skip the first line of the S3 object.
+        remove_dupes (:obj:`bool`, optional): ensure each line is unique.
             Defaults to False.
+        skip_first_line (:obj:`bool`, optional): skip the first line of the S3
+            object. Defaults to False.
 
     Returns:
-        parsed_contents (list): List of lists, where each tuple is the contents
-            of a single line.
+        list: List of lists, where each tuple is the contents of a single line.
     """
     lines = [line for line in contents.split('\r\n') if line != '']
     if remove_dupes:
@@ -257,10 +256,10 @@ def search_path(path, like=None):
 
     Args:
         path (str): input path
-        like (list, optional): List of file regexes to match files on
+        like (:obj:`list`, optional): List of file regexes to match files on
 
     Returns:
-        files (list): list of files matching the specified filetypes
+        list: list of files matching the specified filetypes
     """
     files = []
     LOG.info('Searching for files in %s' % path)
@@ -284,7 +283,7 @@ def clean_dir(path, prefix=None):
 
     Args:
         path (str): input path
-        prefix (str, optional): File prefix
+        prefix (:obj:`str`, optional): File prefix
     """
 
     LOG.info("Cleaning folders in %s" % path)

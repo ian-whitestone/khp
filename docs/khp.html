@@ -182,33 +182,37 @@
 <code class="descclassname">khp.contacts.</code><code class="descname">download_contacts</code><span class="sig-paren">(</span><em>interaction_type</em>, <em>start_date=None</em>, <em>end_date=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/contacts.html#download_contacts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.contacts.download_contacts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download contacts for a given interaction type and time period, and save
 the data.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><p class="first">interaction_type (str): Type of contact (i.e. IM, Voice, Email)
-start_date (str, optional): Start time, <cite>YYYY-mm-dd</cite>. Defaults to</p>
-<blockquote>
-<div>beginning of yesterday.</div></blockquote>
-<dl class="last docutils">
-<dt>start_date (str, optional): End time, <cite>YYYY-mm-dd</cite>. Defaults to</dt>
-<dd>end of yesterday.</dd>
-</dl>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>interaction_type</strong> (<em>str</em>) – Type of contact (i.e. IM, Voice, Email)</li>
+<li><strong>start_date</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, optional) – Start time, <cite>YYYY-mm-dd</cite>. Defaults to
+beginning of yesterday.</li>
+<li><strong>start_date</strong> – End time, <cite>YYYY-mm-dd</cite>. Defaults to
+end of yesterday.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="khp.contacts.download_transcripts">
 <code class="descclassname">khp.contacts.</code><code class="descname">download_transcripts</code><span class="sig-paren">(</span><em>contact_ids=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/contacts.html#download_transcripts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.contacts.download_transcripts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download transcripts for a list of contact_ids.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><dl class="first last docutils">
-<dt>contact_ids (list, optional): List of Contact IDs to retrieve recordings</dt>
-<dd>for. If None are provided (default), queries contacts that have not
-been parsed</dd>
-</dl>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>contact_ids</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>, optional) – List of Contact IDs to retrieve
+recordings for. If None are provided (default), queries contacts
+that have not been parsed</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -224,10 +228,16 @@ enhanced_transcripts</p>
 <code class="descclassname">khp.contacts.</code><code class="descname">get_contacts_to_load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/contacts.html#get_contacts_to_load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.contacts.get_contacts_to_load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Grab the filenames of all contact files that have not been loaded to
 Postgres.</p>
-<dl class="docutils">
-<dt>Returns:</dt>
-<dd>list: List of contact filenames to load</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List of contact filenames to load</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -235,21 +245,34 @@ Postgres.</p>
 <code class="descclassname">khp.contacts.</code><code class="descname">get_transcripts_to_load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/contacts.html#get_transcripts_to_load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.contacts.get_transcripts_to_load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Grab the filenames of all transcript files that have not been loaded to
 Postgres</p>
-<dl class="docutils">
-<dt>Returns:</dt>
-<dd>list: List of trancsript files to load</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List of trancsript files to load</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="khp.contacts.load_enhanced_transcript">
 <code class="descclassname">khp.contacts.</code><code class="descname">load_enhanced_transcript</code><span class="sig-paren">(</span><em>contact_id</em>, <em>summary</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/contacts.html#load_enhanced_transcript"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.contacts.load_enhanced_transcript" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load the transcript summary dictionary to the enhanced_transcripts table</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>contact_id (int): contact id
-summary (dict): Summary dict of the transcript</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>contact_id</strong> (<em>int</em>) – contact id</li>
+<li><strong>summary</strong> (<em>dict</em>) – Summary dict of the transcript</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -257,38 +280,94 @@ summary (dict): Summary dict of the transcript</dd>
 <code class="descclassname">khp.contacts.</code><code class="descname">load_transcripts_df</code><span class="sig-paren">(</span><em>contact_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/contacts.html#load_transcripts_df"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.contacts.load_transcripts_df" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load the transcripts data associated with a set of contact_ids into
 a pandas Dataframe.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>contact_ids (list): List of contact ids to load</dd>
-<dt>Returns:</dt>
-<dd>pandas.Dataframe: Dataframe containing the loaded transcripts</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>contact_ids</strong> (<em>list</em>) – List of contact ids to load</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Dataframe containing the loaded transcripts</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">pandas.Dataframe</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="khp.contacts.main">
 <code class="descclassname">khp.contacts.</code><code class="descname">main</code><span class="sig-paren">(</span><em>interaction_type='IM'</em>, <em>start_date=None</em>, <em>end_date=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/contacts.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.contacts.main" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Run the full contacts pipeline.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>interaction_type</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, optional) – Type of contact (i.e. IM,
+Voice, Email)</li>
+<li><strong>start_date</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, optional) – Start date, format YYYY-mm-dd</li>
+<li><strong>end_date</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, optional) – End date, format YYYY-mm-dd</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="khp.contacts.parse_contacts_file">
 <code class="descclassname">khp.contacts.</code><code class="descname">parse_contacts_file</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/contacts.html#parse_contacts_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.contacts.parse_contacts_file" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Parse the JSON contacts file downloaded from Icescape. Parsing includes:</p>
+<ul class="simple">
+<li>Reading JSON file into python object</li>
+<li>Running transformations on each contact dict in the contacts file</li>
+<li>Uploading parsed/transformed contact dicts into Postgres</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) – Full path of the contacts file</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="khp.contacts.parse_transcript">
 <code class="descclassname">khp.contacts.</code><code class="descname">parse_transcript</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/contacts.html#parse_transcript"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.contacts.parse_transcript" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Parse the transcript file downloaded from Icescape. Parsing includes:</p>
+<ul class="simple">
+<li>Reading JSON file into python object</li>
+<li>Running transformations on the raw transcript</li>
+<li>Uploading parsed/transformed cmessages into Postgres</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) – Full path of the transcript file</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="khp.contacts.save_data">
 <code class="descclassname">khp.contacts.</code><code class="descname">save_data</code><span class="sig-paren">(</span><em>data</em>, <em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/contacts.html#save_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.contacts.save_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save data from icescape API.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>data (list or dict): data to save locally or in S3
-filename (str): filename to save data to</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data</strong> (<em>list</em><em> or </em><em>dict</em>) – data to save locally or in S3</li>
+<li><strong>filename</strong> (<em>str</em>) – filename to save data to</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -302,46 +381,81 @@ filename (str): filename to save data to</dd>
 <em class="property">class </em><code class="descclassname">khp.icescape.</code><code class="descname">Icescape</code><a class="reference internal" href="_modules/khp/icescape.html#Icescape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.icescape.Icescape" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Summary</p>
-<dl class="docutils">
-<dt>Attributes:</dt>
-<dd>headers (TYPE): Description
-password (TYPE): Description
-token (TYPE): Description
-user (TYPE): Description
-user_agent (TYPE): Description</dd>
-</dl>
+<dl class="attribute">
+<dt id="khp.icescape.Icescape.headers">
+<code class="descname">headers</code><a class="headerlink" href="#khp.icescape.Icescape.headers" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>TYPE</em> – Description</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="khp.icescape.Icescape.password">
+<code class="descname">password</code><a class="headerlink" href="#khp.icescape.Icescape.password" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>TYPE</em> – Description</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="khp.icescape.Icescape.token">
+<code class="descname">token</code><a class="headerlink" href="#khp.icescape.Icescape.token" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>TYPE</em> – Description</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="khp.icescape.Icescape.user">
+<code class="descname">user</code><a class="headerlink" href="#khp.icescape.Icescape.user" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>TYPE</em> – Description</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="khp.icescape.Icescape.user_agent">
+<code class="descname">user_agent</code><a class="headerlink" href="#khp.icescape.Icescape.user_agent" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>TYPE</em> – Description</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="khp.icescape.Icescape.get_contacts">
 <code class="descname">get_contacts</code><span class="sig-paren">(</span><em>interaction_type</em>, <em>start_time=None</em>, <em>end_time=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/icescape.html#Icescape.get_contacts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.icescape.Icescape.get_contacts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get results from the Icescape QueryContacts2 API.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><p class="first">interaction_type (str): Type of contact (i.e. IM, Voice, Email)
-start_time (str, optional): Start time, accepts date formats</p>
-<blockquote>
-<div><cite>YYYY-mm-dd</cite> or <cite>YYYY-mm-dd H:M:S</cite>. Defaults to beginning of
-yesterday.</div></blockquote>
-<dl class="last docutils">
-<dt>end_time (str, optional): Start time, accepts date formats</dt>
-<dd><cite>YYYY-mm-dd</cite> or <cite>YYYY-mm-dd H:M:S</cite>. Defaults to end of
-yesterday.</dd>
-</dl>
-</dd>
-<dt>Returns:</dt>
-<dd>data (list): Array of contact data dictionaries</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>interaction_type</strong> (<em>str</em>) – Type of contact (i.e. IM, Voice, Email)</li>
+<li><strong>start_time</strong> (<em>str</em><em>, </em><em>optional</em>) – Start time, accepts date formats
+<cite>YYYY-mm-dd</cite> or <cite>YYYY-mm-dd H:M:S</cite>. Defaults to beginning of
+yesterday.</li>
+<li><strong>end_time</strong> (<em>str</em><em>, </em><em>optional</em>) – Start time, accepts date formats
+<cite>YYYY-mm-dd</cite> or <cite>YYYY-mm-dd H:M:S</cite>. Defaults to end of
+yesterday.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Array of contact data dictionaries</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">data (list)</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="khp.icescape.Icescape.get_recordings">
 <code class="descname">get_recordings</code><span class="sig-paren">(</span><em>contact_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/icescape.html#Icescape.get_recordings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.icescape.Icescape.get_recordings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the results from the Icescape GetRecordings API.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>contact_ids (list): List of Contact IDs to retrieve recordings for</dd>
-<dt>Returns:</dt>
-<dd>data (list): Array of contact data dictionaries</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>contact_ids</strong> (<em>list</em>) – List of Contact IDs to retrieve recordings for</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Array of contact data dictionaries</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">data (list)</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -360,20 +474,28 @@ responses from the API, and the transcript dataframes.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class that ingests a dictionary of transforms, and runs those
 transforms on a supplied dictionary or dataframe.</p>
-<dl class="docutils">
-<dt>Attributes:</dt>
-<dd>transforms (list): List of the transformation dictionaries.</dd>
-</dl>
+<dl class="attribute">
+<dt id="khp.transforms.Transformer.transforms">
+<code class="descname">transforms</code><a class="headerlink" href="#khp.transforms.Transformer.transforms" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – List of the transformation dictionaries.</p>
+</dd></dl>
+
 <dl class="staticmethod">
 <dt id="khp.transforms.Transformer.get_input_cols">
 <em class="property">static </em><code class="descname">get_input_cols</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#Transformer.get_input_cols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.Transformer.get_input_cols" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the input columns associated with a transformation</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>transform_dict (dict): Transform dict parsed from transforms.yml</dd>
-<dt>Returns:</dt>
-<dd>list: list of input columns</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>transform_dict</strong> (<em>dict</em>) – Transform dict parsed from transforms.yml</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of input columns</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="staticmethod">
@@ -382,23 +504,33 @@ transforms on a supplied dictionary or dataframe.</p>
 <dd><p>Grab the value associated with a key in a dictionary. Supports the
 nested key definitions in transforms.yml. For example, a key of
 ‘KEY1|KEY2|KEY3’ will return 5 from the following data:</p>
-<dl class="docutils">
-<dt>data = {</dt>
-<dd><dl class="first last docutils">
-<dt>‘KEY1’: {</dt>
-<dd>‘KEY2’: {‘KEY3’: 5, …},
-…</dd>
-</dl>
-</dd>
-</dl>
-<p>}</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>key (str): Dictionary key of the value to return
-data (dict): Dictionary of data to return value from</dd>
-<dt>Returns:</dt>
-<dd>any type: Returns the value associated with the specified key(s)</dd>
-</dl>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s1">&#39;KEY1&#39;</span><span class="p">:</span> <span class="p">{</span>
+         <span class="s1">&#39;KEY2&#39;</span><span class="p">:</span> <span class="p">{</span>
+<span class="hll">             <span class="s1">&#39;KEY3&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+</span>             <span class="o">...</span>
+             <span class="p">},</span>
+         <span class="o">...</span>
+     <span class="p">},</span>
+     <span class="o">...</span>
+ <span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<em>str</em>) – Dictionary key of the value to return</li>
+<li><strong>data</strong> (<em>dict</em>) – Dictionary of data to return value from</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Returns the value associated with the specified key(s)</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="staticmethod">
@@ -422,60 +554,78 @@ data (dict): Dictionary of data to return value from</dd>
 </dd>
 </dl>
 <p>}</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>transforms_meta (list): List of the raw transformation dictionaries.</dd>
-<dt>Returns:</dt>
-<dd>list: List of the transformation dictionaries.</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>transforms_meta</strong> (<em>list</em>) – List of the raw transformation dictionaries.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">List of the transformation dictionaries.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="khp.transforms.Transformer.run_df_transforms">
 <code class="descname">run_df_transforms</code><span class="sig-paren">(</span><em>dataframe</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#Transformer.run_df_transforms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.Transformer.run_df_transforms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the transforms on a supplied dataframe.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><dl class="first last docutils">
-<dt>dataframe (pandas.Dataframe): Input dataframe to run transformation</dt>
-<dd>on.</dd>
-</dl>
-</dd>
-<dt>Returns:</dt>
-<dd>pandas.Dataframe: Dataframe with updated and/or new columns</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dataframe</strong> (<em>pandas.Dataframe</em>) – Input dataframe to run transformation
+on.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Dataframe with updated and/or new columns</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">pandas.Dataframe</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="khp.transforms.Transformer.run_meta_df_transforms">
 <code class="descname">run_meta_df_transforms</code><span class="sig-paren">(</span><em>dataframe</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#Transformer.run_meta_df_transforms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.Transformer.run_meta_df_transforms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run transforms on a supplied dataframe.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><dl class="first last docutils">
-<dt>dataframe (pandas.Dataframe): Input dataframe to run transformation</dt>
-<dd>on.</dd>
-</dl>
-</dd>
-<dt>Returns:</dt>
-<dd>dict: Output dictionary from the input dataframe</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dataframe</strong> (<em>pandas.Dataframe</em>) – Input dataframe to run transformation
+on.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Output dictionary from the input dataframe</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="khp.transforms.Transformer.run_transforms">
 <code class="descname">run_transforms</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#Transformer.run_transforms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.Transformer.run_transforms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the transforms on a supplied dictionary of data.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>data (dict): dictionary of data to run transformation on</dd>
-<dt>Returns:</dt>
-<dd><dl class="first last docutils">
-<dt>(list or dict): data that has been parsed, re-mapped and</dt>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>dict</em>) – dictionary of data to run transformation on</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>data that has been parsed, re-mapped and</dt>
 <dd>transformed according to the self.transforms instructions</dd>
 </dl>
-</dd>
-</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">(list or dict)</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -485,13 +635,24 @@ data (dict): Dictionary of data to return value from</dd>
 <code class="descclassname">khp.transforms.</code><code class="descname">calc_handle_time</code><span class="sig-paren">(</span><em>dataframe</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#calc_handle_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.calc_handle_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the handle time for a contact. Handle time is calculated as
 time elasped between all messages with convo_ind == 1.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>dataframe (pandas.DataFrame): Input dataframe
-parameters (dict): Parameters associated with the transform</dd>
-<dt>Returns:</dt>
-<dd>float: Handle time for the contact, in minutes</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dataframe</strong> (<em>pandas.DataFrame</em>) – Input dataframe</li>
+<li><strong>parameters</strong> (<em>dict</em>) – Parameters associated with the transform</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Handle time for the contact, in minutes</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -501,13 +662,24 @@ parameters (dict): Parameters associated with the transform</dd>
 ‘prev_message_type’ - ‘message_type’, used to indicate whether a message
 was from counsellor to counsellor, counselee to counsellor, system to
 counsellor etc.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>dataframe (pandas.DataFrame): Input dataframe
-parameters (dict): Parameters associated with the transform</dd>
-<dt>Returns:</dt>
-<dd>pandas.Series: Message sequence</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dataframe</strong> (<em>pandas.DataFrame</em>) – Input dataframe</li>
+<li><strong>parameters</strong> (<em>dict</em>) – Parameters associated with the transform</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Message sequence</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pandas.Series</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -515,13 +687,24 @@ parameters (dict): Parameters associated with the transform</dd>
 <code class="descclassname">khp.transforms.</code><code class="descname">calc_response_time</code><span class="sig-paren">(</span><em>dataframe</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#calc_response_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.calc_response_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the response time for each message. Defined as time elapsed
 between message and previous message.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>dataframe (pandas.DataFrame): Input dataframe
-parameters (dict): Parameters associated with the transform</dd>
-<dt>Returns:</dt>
-<dd>pandas.Series: Response time for the message</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dataframe</strong> (<em>pandas.DataFrame</em>) – Input dataframe</li>
+<li><strong>parameters</strong> (<em>dict</em>) – Parameters associated with the transform</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Response time for the message</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pandas.Series</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -530,13 +713,24 @@ parameters (dict): Parameters associated with the transform</dd>
 <dd><p>Calculate the wait time for a contact. Wait time is calculated as
 time elasped between the start of the transcript and the first message
 with convo_ind == 1.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>dataframe (pandas.DataFrame): Input dataframe
-parameters (dict): Parameters associated with the transform</dd>
-<dt>Returns:</dt>
-<dd>float: Wait time for the contact, in minutes</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dataframe</strong> (<em>pandas.DataFrame</em>) – Input dataframe</li>
+<li><strong>parameters</strong> (<em>dict</em>) – Parameters associated with the transform</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Wait time for the contact, in minutes</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -546,12 +740,18 @@ parameters (dict): Parameters associated with the transform</dd>
 with single spaces (since newlines break things when uploading to the DB).
 Get rid of everything that isn’t a number, letter, or in a list of
 characters to keep.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>text (str): Text string to clean</dd>
-<dt>Returns:</dt>
-<dd>str: Cleaned text str</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>text</strong> (<em>str</em>) – Text string to clean</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Cleaned text str</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -561,42 +761,61 @@ characters to keep.</p>
 filters specified in parameters.</p>
 <p>If multiple aggregators are supplied, a dictionary will be returned instead
 of the float result. For example, if the following parameters are provided:</p>
-<dl class="docutils">
-<dt>parameters = {</dt>
-<dd>‘output’: khp_response_time,
-‘aggregator’: [mean, max]</dd>
-</dl>
-<p>}</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="n">khp_response_time</span><span class="p">,</span>
+<span class="hll">     <span class="s1">&#39;aggregator&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">mean</span><span class="p">,</span> <span class="nb">max</span><span class="p">]</span>
+</span> <span class="p">}</span>
+</pre></div>
+</div>
 <p>Function will return:</p>
-<p>{mean_khp_response_time: 1.2325, max_khp_response_time: 55.212}</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>dataframe (pandas.DataFrame): Input dataframe
-parameters (dict): Parameters associated with the transform</dd>
-<dt>Returns:</dt>
-<dd><dl class="first last docutils">
-<dt>dict or float: If multiple aggregators are supplied, returns a dict</dt>
-<dd>with the result of each aggregator. Otherwise, returns the float
-result of the aggregator operation.</dd>
-</dl>
-</dd>
-</dl>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="n">mean_khp_response_time</span><span class="p">:</span> <span class="mf">1.2325</span><span class="p">,</span> <span class="n">max_khp_response_time</span><span class="p">:</span> <span class="mf">55.212</span><span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dataframe</strong> (<em>pandas.DataFrame</em>) – Input dataframe</li>
+<li><strong>parameters</strong> (<em>dict</em>) – Parameters associated with the transform</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">aggregator operation output. If multiple aggregators are supplied, returns a dict with the result of
+each aggregator. Otherwise, returns the float result of the
+aggregator operation.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict or float</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="khp.transforms.convert_timedelta">
 <code class="descclassname">khp.transforms.</code><code class="descname">convert_timedelta</code><span class="sig-paren">(</span><em>value</em>, <em>unit</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#convert_timedelta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.convert_timedelta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a timedelta64 object to a float</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><p class="first">value (numpy.timedelta64[ns]): Timedelta value to convert
-unit (TYPE): Datetime unit code, see link for a list of acceptable codes</p>
-<blockquote class="last">
-<div><a class="reference external" href="https://docs.scipy.org/doc/numpy-dev/reference/arrays.datetime.html">https://docs.scipy.org/doc/numpy-dev/reference/arrays.datetime.html</a></div></blockquote>
-</dd>
-<dt>Returns:</dt>
-<dd>float: Converted timedelta value</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>value</strong> (<em>numpy.timedelta64</em><em>[</em><em>ns</em><em>]</em>) – Timedelta value to convert</li>
+<li><strong>unit</strong> (<em>TYPE</em>) – Datetime unit code, see link for a list of acceptable codes
+<a class="reference external" href="https://docs.scipy.org/doc/numpy-dev/reference/arrays.datetime.html">https://docs.scipy.org/doc/numpy-dev/reference/arrays.datetime.html</a></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Converted timedelta value</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -605,13 +824,24 @@ unit (TYPE): Datetime unit code, see link for a list of acceptable codes</p>
 <dd><p>Create an indicator for each message to signal whether it’s part of the
 conversation. A message is deemed part of the conversation if it appears
 after the convo_start_ind messages and is message type 3 or 4.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>dataframe (pandas.DataFrame): Input dataframe
-parameters (dict): Parameters associated with the transform</dd>
-<dt>Returns:</dt>
-<dd>pandas.Series: Conversation indicator</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dataframe</strong> (<em>pandas.DataFrame</em>) – Input dataframe</li>
+<li><strong>parameters</strong> (<em>dict</em>) – Parameters associated with the transform</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Conversation indicator</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pandas.Series</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -620,26 +850,48 @@ parameters (dict): Parameters associated with the transform</dd>
 <dd><p>Create an indicator for each message to signal whether it’s the start of
 the conversation. Starting messages are detected using a regex, since the
 starting messages are system generated (hence filtering on message_type=1).</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>dataframe (pandas.DataFrame): Input dataframe
-parameters (dict): Parameters associated with the transform</dd>
-<dt>Returns:</dt>
-<dd>pandas.Series: Conversation start indicator</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dataframe</strong> (<em>pandas.DataFrame</em>) – Input dataframe</li>
+<li><strong>parameters</strong> (<em>dict</em>) – Parameters associated with the transform</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Conversation start indicator</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pandas.Series</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="khp.transforms.filter_df">
 <code class="descclassname">khp.transforms.</code><code class="descname">filter_df</code><span class="sig-paren">(</span><em>dataframe</em>, <em>filters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#filter_df"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.filter_df" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filter a dataframe</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>dataframe (pandas.DataFrame): Input dataframe
-filters (list): list of filters (dicts) to apply</dd>
-<dt>Returns:</dt>
-<dd>pandas.DataFrame: Filtered dataframe</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dataframe</strong> (<em>pandas.DataFrame</em>) – Input dataframe</li>
+<li><strong>filters</strong> (<em>list</em>) – list of filters (dicts) to apply</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Filtered dataframe</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pandas.DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -648,52 +900,79 @@ filters (list): list of filters (dicts) to apply</dd>
 <dd><p>Parse the handlers associated with a contact. Split out primary handler
 and secondary handlers, assuming primary handler as the first handler in
 the list of handlers.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>handlers (list): List of handlers</dd>
-<dt>Returns:</dt>
-<dd>dict: Dictionary containing primary and secondary handlers</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>handlers</strong> (<em>list</em>) – List of handlers</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Dictionary containing primary and secondary handlers</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="khp.transforms.parse_html">
 <code class="descclassname">khp.transforms.</code><code class="descname">parse_html</code><span class="sig-paren">(</span><em>html</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#parse_html"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.parse_html" title="Permalink to this definition">¶</a></dt>
 <dd><p>Utilize the beautiful soup html parser to return the text from html</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>html (str): String of html</dd>
-<dt>Returns:</dt>
-<dd>str: extracted text</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>html</strong> (<em>str</em>) – String of html</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">extracted text</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="khp.transforms.parse_message">
 <code class="descclassname">khp.transforms.</code><code class="descname">parse_message</code><span class="sig-paren">(</span><em>message_text</em>, <em>is_html</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#parse_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.parse_message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the text from a (potentially) html message string</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><p class="first">message_text (str): Description
-is_html (bool): Boolean indicator whether the text is html, provided</p>
-<blockquote class="last">
-<div>upstream from the API response.</div></blockquote>
-</dd>
-<dt>Returns:</dt>
-<dd>str: Parsed message text</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>message_text</strong> (<em>str</em>) – Description</li>
+<li><strong>is_html</strong> (<em>bool</em>) – Boolean indicator whether the text is html, provided
+upstream from the API response.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Parsed message text</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="khp.transforms.parse_messages">
 <code class="descclassname">khp.transforms.</code><code class="descname">parse_messages</code><span class="sig-paren">(</span><em>messages</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#parse_messages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.parse_messages" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transformation function to parse a list of messages</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>messages (list): List of message dicts</dd>
-<dt>Returns:</dt>
-<dd>list: List of transformed message dicts</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>messages</strong> (<em>list</em>) – List of message dicts</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">List of transformed message dicts</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -701,39 +980,72 @@ is_html (bool): Boolean indicator whether the text is html, provided</p>
 <code class="descclassname">khp.transforms.</code><code class="descname">row_count</code><span class="sig-paren">(</span><em>dataframe</em>, <em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#row_count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.row_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Count the number of rows in a dataframe, optionally applying filters
 specified in parameters.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>dataframe (pandas.DataFrame): Input dataframe
-parameters (dict): Parameters associated with the transform</dd>
-<dt>Returns:</dt>
-<dd>int: Number of rows</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dataframe</strong> (<em>pandas.DataFrame</em>) – Input dataframe</li>
+<li><strong>parameters</strong> (<em>dict</em>) – Parameters associated with the transform</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Number of rows</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="khp.transforms.str_length">
 <code class="descclassname">khp.transforms.</code><code class="descname">str_length</code><span class="sig-paren">(</span><em>dataframe</em>, <em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#str_length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.str_length" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the length of a string</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>dataframe (pandas.DataFrame): Input dataframe
-parameters (dict): Parameters associated with the transform</dd>
-<dt>Returns:</dt>
-<dd>pandas.Series: Number of characters for each row of a column</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dataframe</strong> (<em>pandas.DataFrame</em>) – Input dataframe</li>
+<li><strong>parameters</strong> (<em>dict</em>) – Parameters associated with the transform</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Number of characters for each row of a column</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pandas.Series</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="khp.transforms.word_count">
 <code class="descclassname">khp.transforms.</code><code class="descname">word_count</code><span class="sig-paren">(</span><em>dataframe</em>, <em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/transforms.html#word_count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.transforms.word_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Count the number of words in a string</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>dataframe (pandas.DataFrame): Input dataframe
-parameters (dict): Parameters associated with the transform</dd>
-<dt>Returns:</dt>
-<dd>pandas.Series: Word counts for each row of a column</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dataframe</strong> (<em>pandas.DataFrame</em>) – Input dataframe</li>
+<li><strong>parameters</strong> (<em>dict</em>) – Parameters associated with the transform</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Word counts for each row of a column</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pandas.Series</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -745,9 +1057,15 @@ parameters (dict): Parameters associated with the transform</dd>
 <code class="descclassname">khp.utils.</code><code class="descname">check_response</code><span class="sig-paren">(</span><em>response</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#check_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.check_response" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check the status of a requests response. If the status code is not 200,
 log the error and raise an exception.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>response</strong> (<em>requests.models.Response</em>) – Requests response object</td>
+</tr>
+</tbody>
+</table>
 <dl class="docutils">
-<dt>Args:</dt>
-<dd>response (requests.models.Response): Requests response object</dd>
 <dt>Raises</dt>
 <dd>Exception: If the status code is not 200</dd>
 </dl>
@@ -757,55 +1075,96 @@ log the error and raise an exception.</p>
 <dt id="khp.utils.chunker">
 <code class="descclassname">khp.utils.</code><code class="descname">chunker</code><span class="sig-paren">(</span><em>seq</em>, <em>chunk_size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#chunker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.chunker" title="Permalink to this definition">¶</a></dt>
 <dd><p>Break a list into a set of smaller lists with len = chunk_size</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>seq (list): list to split up into chunks
-chunk_size (int): size of chunks</dd>
-<dt>Returns:</dt>
-<dd>list: list of lists with len = chunk_size</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>seq</strong> (<em>list</em>) – list to split up into chunks</li>
+<li><strong>chunk_size</strong> (<em>int</em>) – size of chunks</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of lists with len = chunk_size</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="khp.utils.clean_dir">
 <code class="descclassname">khp.utils.</code><code class="descname">clean_dir</code><span class="sig-paren">(</span><em>path</em>, <em>prefix=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#clean_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.clean_dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function to clear any folders and files in a specified path.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>path (str): input path
-prefix (str, optional): File prefix</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>path</strong> (<em>str</em>) – input path</li>
+<li><strong>prefix</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, optional) – File prefix</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="khp.utils.convert_timezone">
 <code class="descclassname">khp.utils.</code><code class="descname">convert_timezone</code><span class="sig-paren">(</span><em>dt</em>, <em>tz1</em>, <em>tz2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#convert_timezone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.convert_timezone" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a datetime object from one timezone to another timezone</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>dt (datetime.datime): Datetime object to convert
-tz1 (str): pytz acceptable timezone that dt is in
-tz1 (str): pytz acceptable timezone to conver to</dd>
-<dt>Returns:</dt>
-<dd>dt2 (datetime.datetime): Datetime object in timezone 2</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dt</strong> (<em>datetime.datime</em>) – Datetime object to convert</li>
+<li><strong>tz1</strong> (<em>str</em>) – pytz acceptable timezone that dt is in</li>
+<li><strong>tz1</strong> – pytz acceptable timezone to conver to</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Datetime object in timezone 2</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">datetime.datetime</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="khp.utils.generate_date_range">
 <code class="descclassname">khp.utils.</code><code class="descname">generate_date_range</code><span class="sig-paren">(</span><em>start_date</em>, <em>end_date</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#generate_date_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.generate_date_range" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate the range of dates between start_date and end_date</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>start_date (str): Start date, <cite>YYYY-mm-dd</cite>
-end_date (str): End date, <cite>YYYY-mm-dd</cite></dd>
-<dt>Returns:</dt>
-<dd><dl class="first last docutils">
-<dt>date_range (list): List of dates, as datetime.datetime objects, between</dt>
-<dd>start_date and end_date</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>start_date</strong> (<em>str</em>) – Start date, <cite>YYYY-mm-dd</cite></li>
+<li><strong>end_date</strong> (<em>str</em>) – End date, <cite>YYYY-mm-dd</cite></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>List of dates, as datetime.datetime objects, between start_date</dt>
+<dd><p class="first last">and end_date</p>
 </dd>
 </dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -813,94 +1172,134 @@ end_date (str): End date, <cite>YYYY-mm-dd</cite></dd>
 <code class="descclassname">khp.utils.</code><code class="descname">get_s3_keys</code><span class="sig-paren">(</span><em>s3_bucket</em>, <em>prefix=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#get_s3_keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.get_s3_keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a list of keys in an S3 bucket. Optionally specify a prefix to
 narrow down the keys returned.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>s3_bucket (str): Name of the S3 bucket.
-prefix (str, optional): File prefix. Defaults to None.</dd>
-<dt>Returns:</dt>
-<dd>keys (list): List of keys in the S3 bucket.</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>s3_bucket</strong> (<em>str</em>) – Name of the S3 bucket.</li>
+<li><strong>prefix</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, optional) – File prefix. Defaults to None.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of keys in the S3 bucket.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="khp.utils.parse_date">
 <code class="descclassname">khp.utils.</code><code class="descname">parse_date</code><span class="sig-paren">(</span><em>str_dt</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#parse_date"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.parse_date" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a date string to a datetime object</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><dl class="first last docutils">
-<dt>str_dt (str): Date in any format excepted by dateutil.parser. WARNING:</dt>
-<dd>read the dateutil.parser docs before using to udnerstand default
-behaviour (i.e. how str_dt’s like <cite>2018</cite> or <cite>2</cite> are handled)</dd>
-</dl>
-</dd>
-<dt>Returns:</dt>
-<dd>dt (datetime.datetime): Datetime object</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>str_dt</strong> (<em>str</em>) – Date in any format excepted by dateutil.parser. WARNING:
+read the dateutil.parser docs before using to udnerstand default
+behaviour (i.e. how str_dt’s like <cite>2018</cite> or <cite>2</cite> are handled)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Datetime object</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">datetime.datetime</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="khp.utils.parse_s3_contents">
 <code class="descclassname">khp.utils.</code><code class="descname">parse_s3_contents</code><span class="sig-paren">(</span><em>contents</em>, <em>delimiter</em>, <em>remove_dupes=False</em>, <em>skip_first_line=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#parse_s3_contents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.parse_s3_contents" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the contents of an S3 object into a list of lists.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><p class="first">contents (str): contents of an S3 object
-delimiter (str): delimiter to split the contents of each line with
-remove_dupes (bool, optional): ensure each line is unique. Defaults to</p>
-<blockquote>
-<div>False.</div></blockquote>
-<dl class="last docutils">
-<dt>skip_first_line (bool, optional): skip the first line of the S3 object.</dt>
-<dd>Defaults to False.</dd>
-</dl>
-</dd>
-<dt>Returns:</dt>
-<dd><dl class="first last docutils">
-<dt>parsed_contents (list): List of lists, where each tuple is the contents</dt>
-<dd>of a single line.</dd>
-</dl>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>contents</strong> (<em>str</em>) – contents of an S3 object</li>
+<li><strong>delimiter</strong> (<em>str</em>) – delimiter to split the contents of each line with</li>
+<li><strong>remove_dupes</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>, optional) – ensure each line is unique.
+Defaults to False.</li>
+<li><strong>skip_first_line</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>, optional) – skip the first line of the S3
+object. Defaults to False.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of lists, where each tuple is the contents of a single line.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="khp.utils.read_jason">
 <code class="descclassname">khp.utils.</code><code class="descname">read_jason</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#read_jason"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.read_jason" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a json file into a python object</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>filename (str): path of the file</dd>
-<dt>Returns:</dt>
-<dd>data (list or dict): parsed data from the file</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) – path of the file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">parsed data from the file</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list or dict</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="khp.utils.read_s3_file">
 <code class="descclassname">khp.utils.</code><code class="descname">read_s3_file</code><span class="sig-paren">(</span><em>s3_bucket</em>, <em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#read_s3_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.read_s3_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the contents of an S3 object.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>s3_bucket (str): Name of the S3 bucket.
-key (str): Name of the S3 object</dd>
-<dt>Returns:</dt>
-<dd>contents (str): Contents of S3 object</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>s3_bucket</strong> (<em>str</em>) – Name of the S3 bucket.</li>
+<li><strong>key</strong> (<em>str</em>) – Name of the S3 object</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Contents of S3 object</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="khp.utils.read_yaml">
 <code class="descclassname">khp.utils.</code><code class="descname">read_yaml</code><span class="sig-paren">(</span><em>yaml_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#read_yaml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.read_yaml" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a yaml file.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>yaml_file (str): Full path of the yaml file.</dd>
-<dt>Returns:</dt>
-<dd>data (dict): Dictionary of yaml_file contents.</dd>
-<dt>Raises:</dt>
-<dd>Exception: If the yaml_file cannot be opened.</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>yaml_file</strong> (<em>str</em>) – Full path of the yaml file.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Dictionary of yaml_file contents.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">Exception</span></code> – If the yaml_file cannot be opened.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -908,50 +1307,79 @@ key (str): Name of the S3 object</dd>
 <code class="descclassname">khp.utils.</code><code class="descname">search_path</code><span class="sig-paren">(</span><em>path</em>, <em>like=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#search_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.search_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search a path and return all the files. Optionally specify file prefixes
 and/or filetypes to narrow your criteria.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>path (str): input path
-like (list, optional): List of file regexes to match files on</dd>
-<dt>Returns:</dt>
-<dd>files (list): list of files matching the specified filetypes</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<em>str</em>) – input path</li>
+<li><strong>like</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>, optional) – List of file regexes to match files on</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of files matching the specified filetypes</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="khp.utils.upload_to_s3">
 <code class="descclassname">khp.utils.</code><code class="descname">upload_to_s3</code><span class="sig-paren">(</span><em>s3_bucket</em>, <em>files</em>, <em>encrypt=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#upload_to_s3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.upload_to_s3" title="Permalink to this definition">¶</a></dt>
 <dd><p>Upload a list of files to S3.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><p class="first">s3_bucket (str): Name of the S3 bucket.
-files (list): List of files to upload
-encrypt (bool, optional): Use serverside AES256 encryption, defaults to</p>
-<blockquote class="last">
-<div>True.</div></blockquote>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>s3_bucket</strong> (<em>str</em>) – Name of the S3 bucket.</li>
+<li><strong>files</strong> (<em>list</em>) – List of files to upload</li>
+<li><strong>encrypt</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>, optional) – Use serverside AES256 encryption,
+defaults to True.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="khp.utils.write_jason">
 <code class="descclassname">khp.utils.</code><code class="descname">write_jason</code><span class="sig-paren">(</span><em>data</em>, <em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#write_jason"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.write_jason" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a Python list or dictionary to a json file.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>data (list or dict): data to write to file
-filename (str): path of the file to write to</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data</strong> (<em>list</em><em> or </em><em>dict</em>) – data to write to file</li>
+<li><strong>filename</strong> (<em>str</em>) – path of the file to write to</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="khp.utils.yesterdays_range">
 <code class="descclassname">khp.utils.</code><code class="descname">yesterdays_range</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/khp/utils.html#yesterdays_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#khp.utils.yesterdays_range" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate yesterdays date range, in datetime objects</p>
-<dl class="docutils">
-<dt>Returns:</dt>
-<dd>start (datetime.datetime): Beginning of yesterday
-end (datetime.datetime): End of yesterday</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Beginning of yesterday
+datetime.datetime: End of yesterday</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">datetime.datetime</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
