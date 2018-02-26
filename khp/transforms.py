@@ -248,7 +248,7 @@ def column_operator(dataframe, parameters):
         for agg_name in parameters['aggregator']:
             agg = getattr(np, agg_name)
             output_name = '{}_{}'.format(agg_name, parameters['output'])
-            series = getattr(dataframe, parameters['column'])
+            series = getattr(fltr_df, parameters['column'])
             if post_operator:
                 result[output_name] = post_operator(agg(series), post_args)
             else:
@@ -256,7 +256,7 @@ def column_operator(dataframe, parameters):
     else:
         agg_name = parameters['aggregator']
         agg = getattr(np, agg_name)
-        series = getattr(dataframe, parameters['column'])
+        series = getattr(fltr_df, parameters['column'])
         if post_operator:
             result = post_operator(agg(series), post_args)
         else:

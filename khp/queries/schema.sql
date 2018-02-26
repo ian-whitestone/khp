@@ -106,8 +106,10 @@ CREATE TABLE enhanced_transcripts (
   median_ext_response_time DECIMAL(10,2),
 
   sum_khp_response_time DECIMAL(10,2),
-  sum_ext_response_time DECIMAL(10,2)
+  sum_ext_response_time DECIMAL(10,2),
   -- TODO: add survey info!!
+
+  PRIMARY KEY (contact_id)
 )
 ;
 
