@@ -229,9 +229,9 @@ def column_operator(dataframe, parameters):
         parameters (dict): Parameters associated with the transform
 
     Returns:
-        dict or float: aggregator operation output. If multiple aggregators are supplied, returns a dict with the result of
-        each aggregator. Otherwise, returns the float result of the
-        aggregator operation.
+        dict or float: aggregator operation output. If multiple aggregators are
+        supplied, returns a dict with the result of each aggregator.
+        Otherwise, returns the float result of the aggregator operation.
     """
     fltr_df = dataframe
     if 'filters' in parameters.keys():

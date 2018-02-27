@@ -237,6 +237,20 @@ def load_enhanced_transcript(contact_id, summary):
                   columns=columns, host=DB_CONF['host'], user=DB_CONF['user'],
                   password=DB_CONF['pwd'], database=DB_CONF['db'])
 
+def replace_nans(summary):
+    """Replace any np.nan's in the summary dict prior to loading to Postgres
+
+    Args:
+        summary (dict): Summary dict of the transcript
+
+    Returns:
+        dict: Summary dict of the transcript, with any nan's replaced with None
+    """
+    for key, value in summary.items():
+        if pd.isnull(value):
+            summary[key] = None
+    return summary
+
 def enhanced_transcripts():
     """Read in un-processed transcripts from Postgres, perform a series of
     operations to produce metadata per contact_id, load into table
@@ -261,6 +275,7 @@ def enhanced_transcripts():
         dataframe = load_transcripts_df([contact_id])
         dataframe = optimus.run_df_transforms(dataframe)
         summary = megatron.run_meta_df_transforms(dataframe)
+        summary = replace_nans(summary)
         load_enhanced_transcript(contact_id, summary)
     return
 
