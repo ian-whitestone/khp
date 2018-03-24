@@ -20,24 +20,32 @@ class Icescape():
 
     def __init__(self):
         self.conf = config.CONFIG['icescape']
-        self.user = self.conf['user']
-        self.password = self.conf['password']
+        self.password = self.conf['pstring']
         self.user_agent = self.conf['user_agent']
         self.token = self._get_access_token()
         self.headers = self._build_headers()
 
     def _get_access_token(self):
         base_url = self.conf['login_url']
+        headers = self._build_login_headers()
         LOG.info("Getting access token")
-        r = requests.post(base_url, params={'userID': self.user,
-                                            'password': self.password})
+        r = requests.post(base_url, data=json.dumps(self.password), headers=headers)
         utils.check_response(r)
         data = r.json()
         token = data['AccessToken']
         return token
 
+    def _build_login_headers(self):
+        headers = self.conf['headers'].copy()
+        headers.pop('Authorization')
+        headers.pop('If-Modified-Since')
+        headers['Content-Length'] = "74"
+        headers['User-Agent'] = self.user_agent
+        return headers
+
     def _build_headers(self):
         headers = self.conf['headers']
+        headers['User-Agent'] = self.user_agent
         headers['Authorization'] = headers['Authorization'].format(self.token)
         return headers
 
