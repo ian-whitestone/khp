@@ -45,8 +45,12 @@ def convo_indicator(dataframe):
         pandas.Series: Conversation indicator
     """
     mtype_check = dataframe['message_type'].isin([3, 4])
-    start_index = max(dataframe[dataframe['convo_start_ind'] == 1].index)
-    index_check = dataframe.index > start_index
+    convo_start_index = dataframe[dataframe['convo_start_ind'] == 1].index
+    if not convo_start_index.empty:
+        start_index = max(dataframe[dataframe['convo_start_ind'] == 1].index)
+        index_check = dataframe.index > start_index
+    else:
+        index_check = pd.Series(True, index=dataframe.index)
     convo_ind = pd.Series(0, index=dataframe.index)
     convo_ind.loc[mtype_check & index_check] = 1
     return convo_ind

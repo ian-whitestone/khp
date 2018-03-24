@@ -322,3 +322,7 @@ def main(interaction_type='IM', start_date=None, end_date=None):
 
     ## ENHANCED TRANSCRIPTS ##
     enhanced_transcripts()
+
+
+if __name__ == "__main__":
+    main()
