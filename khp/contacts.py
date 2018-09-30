@@ -154,10 +154,14 @@ def parse_transcript(filename):
     load_data = [[message[key] for key in columns]
                  for message in messages]
 
+    for i, row in enumerate(load_data):
+        for j, record in enumerate(row):
+            if isinstance(record, str):
+                load_data[i][j] = load_data[i][j].replace('|', '')
+
     postgrez.load(table_name="transcripts", data=load_data, columns=columns,
                   host=DB_CONF['host'], user=DB_CONF['user'],
                   password=DB_CONF['pwd'], database=DB_CONF['db'])
-    return
 
 
 def get_contacts_to_load():
@@ -289,6 +293,7 @@ def main(interaction_type='IM', start_date=None, end_date=None):
         end_date (:obj:`str`, optional): End date, format YYYY-mm-dd
 
     """
+    config.init_logging()
     config.log_ascii()
     if start_date is None and end_date is None:
         yesterday = datetime.today() - timedelta(1)
