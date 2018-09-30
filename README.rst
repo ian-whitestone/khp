@@ -17,6 +17,15 @@ KHP
 
 Data infrastructure for the Kids Help Phone.
 
+
+Setup
+-------
+
+.. code-block:: bash
+
+    conda env create -f environment.yml
+    conda activate khp
+
 FTP Servers
 ------------
 
