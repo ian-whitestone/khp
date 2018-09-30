@@ -9,7 +9,7 @@ from khp import config
 from khp.icescape import Icescape
 from khp.transforms import Transformer
 
-LOG = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 CONF = config.CONFIG
 DB_CONF = CONF['database']
 
@@ -73,16 +73,16 @@ def download_transcripts(contact_ids=None):
         contact_ids = [record['contact_id'] for record in data]
 
     if not contact_ids:
-        LOG.warning("No contact ids to parse. Exiting..")
+        LOGGER.warning("No contact ids to parse. Exiting..")
         return
 
-    LOG.info("Attempting to process %s contact ids", len(contact_ids))
+    LOGGER.info("Attempting to process %s contact ids", len(contact_ids))
     ice = Icescape()
     for chunked_contact_ids in utils.chunker(contact_ids, 20):
         transcripts = ice.get_recordings(chunked_contact_ids)
         if len(transcripts) != len(chunked_contact_ids):
             missing = list(set(chunked_contact_ids) - set(transcripts))
-            LOG.warning('Missing transcripts %s', missing)
+            LOGGER.warning('Missing transcripts %s', missing)
             raise Exception("Transcripts not returned for all contact ids")
         for contact_id, transcript in zip(chunked_contact_ids, transcripts):
             filename = "{}_data.txt".format(contact_id)
@@ -106,13 +106,13 @@ def parse_contacts_file(filename):
     Args:
         filename (str): Full path of the contacts file
     """
-    LOG.info("Parsing contact file %s", filename)
+    LOGGER.info("Parsing contact file %s", filename)
     base_file = os.path.basename(filename)
     interaction_type = base_file.split('_')[0]
 
     contacts = utils.read_jason(filename)
     if not contacts:
-        LOG.warning("Empty contacts file. Exiting..")
+        LOGGER.warning("Empty contacts file. Exiting..")
         return
     transforms_meta = config.TRANSFORMS["contacts"]
     optimus = Transformer(transforms_meta)
@@ -142,7 +142,7 @@ def parse_transcript(filename):
     Args:
         filename (str): Full path of the transcript file
     """
-    LOG.info("Parsing transcript file %s", filename)
+    LOGGER.info("Parsing transcript file %s", filename)
 
     transcript = utils.read_jason(filename)
     transforms_meta = config.TRANSFORMS["recording"]
@@ -198,7 +198,7 @@ def get_transcripts_to_load():
         contact_id = int(basename.split('_data.txt')[0])
         if contact_id not in loaded_contacts:
             to_load.append(basename)
-    LOG.info("%s transcripts to parse and load", len(to_load))
+    LOGGER.info("%s transcripts to parse and load", len(to_load))
     return to_load
 
 def load_transcripts_df(contact_ids):
@@ -211,7 +211,7 @@ def load_transcripts_df(contact_ids):
     Returns:
         pandas.Dataframe: Dataframe containing the loaded transcripts
     """
-    LOG.info("Loading transcripts for contact_ids: %s", contact_ids)
+    LOGGER.info("Loading transcripts for contact_ids: %s", contact_ids)
     query = """
         SELECT * FROM transcripts WHERE contact_id IN ({})
         ORDER BY contact_id, dt ASC
@@ -271,7 +271,7 @@ def enhanced_transcripts():
     megatron = Transformer(transcripts_meta_tforms)
 
     for contact_id in to_load:
-        LOG.info('Processing transcript for contact_id %s', contact_id)
+        LOGGER.info('Processing transcript for contact_id %s', contact_id)
         dataframe = load_transcripts_df([contact_id])
         dataframe = optimus.run_df_transforms(dataframe)
         summary = megatron.run_meta_df_transforms(dataframe)
@@ -296,7 +296,7 @@ def main(interaction_type='IM', start_date=None, end_date=None):
         end_date = start_date
 
     if start_date is None or end_date is None:
-        LOG.warning("Provide both start_date and end_date. Exiting..")
+        LOGGER.warning("Provide both start_date and end_date. Exiting..")
         return
 
     ## DOWNLOAD CONTACTS ##

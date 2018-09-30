@@ -38,7 +38,7 @@ CREATE TABLE csi (
 CREATE INDEX csi_queue_id ON csi USING (queue_id);
 CREATE INDEX csi_dt ON csi USING (dt);
 
-
+DROP TABLE IF EXISTS contacts;
 CREATE TABLE contacts (
   contact_id INTEGER,
   queue_id INTEGER,
@@ -58,7 +58,7 @@ CREATE TABLE contacts (
   PRIMARY KEY (contact_id, interaction_type)
 )
 ;
-
+DROP TABLE IF EXISTS transcripts;
 CREATE TABLE transcripts (
   contact_id INTEGER,
   sender TEXT,
@@ -68,7 +68,6 @@ CREATE TABLE transcripts (
   message TEXT
 )
 ;
-
 
 DROP TABLE IF EXISTS enhanced_transcripts;
 CREATE TABLE enhanced_transcripts (

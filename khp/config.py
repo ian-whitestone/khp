@@ -22,9 +22,9 @@ LOGGING_PATH = os.path.join(CONFIG_DIR, 'logging.yml')
 
 ## Initialize logging
 LOG_CONF = utils.read_yaml(LOGGING_PATH)
-now = datetime.now().strftime('%Y-%m-%d %H:%M')
-log_output_file = os.path.join(LOGGING_DIR, now + '.txt')
-LOG_CONF['handlers']['file']['filename'] = log_output_file
+NOW = datetime.now().strftime('%Y-%m-%d %H:%M')
+LOG_OUTPUT_FILE = os.path.join(LOGGING_DIR, NOW + '.txt')
+LOG_CONF['handlers']['file']['filename'] = LOG_OUTPUT_FILE
 logging.config.dictConfig(LOG_CONF)
 
 ## LOAD YAML FILES

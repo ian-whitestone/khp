@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import numpy as np
 
-LOG = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 def convo_start_indicator(dataframe):
     """Create an indicator for each message to signal whether it's the start of
@@ -463,8 +463,8 @@ class Transformer():
             parameters = tform['items']
             output_name = parameters['output']
             transform = getattr(sys.modules[__name__], transform_name)
-            LOG.info('Running transform: %s on input dataframe with params %s',
-                     transform_name, parameters)
+            LOGGER.debug('Running transform: %s on input dataframe with params %s',
+                         transform_name, parameters)
             if 'parameters' in transform.__code__.co_varnames:
                 dataframe[output_name] = transform(dataframe, parameters)
             else:
@@ -488,8 +488,8 @@ class Transformer():
             parameters = tform['items']
             output_name = parameters['output']
             transform = getattr(sys.modules[__name__], transform_name)
-            LOG.info('Running transform: %s on input dataframe with params %s',
-                     transform_name, parameters)
+            LOGGER.debug('Running transform: %s on input dataframe with params %s',
+                         transform_name, parameters)
             if 'parameters' in transform.__code__.co_varnames:
                 output = transform(dataframe, parameters)
             else:
@@ -516,7 +516,6 @@ class Transformer():
             items = transform['items']
             if "transform" in items.keys():
                 func_name = items["transform"]
-                LOG.info('Running transform: %s on data', func_name)
                 tform_func = getattr(sys.modules[__name__], func_name)
                 value = tform_func(value)
 

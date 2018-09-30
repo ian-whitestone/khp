@@ -1,20 +1,20 @@
 """
-Utils module, contains utility functions used throughout the codebase.
+Contains utility functions used throughout the codebase.
 """
 
 import logging
-import yaml
 import os
-import boto3
-import pytz
 import re
-
-import dateutil.parser
-from datetime import datetime, timedelta, date
 import json
-import pandas as pd
+from datetime import datetime, timedelta, date
 
-LOG = logging.getLogger(__name__)
+import pytz
+import dateutil.parser
+import pandas as pd
+import yaml
+import boto3
+
+LOGGER = logging.getLogger(__name__)
 
 def chunker(seq, chunk_size):
     """Break a list into a set of smaller lists with len = chunk_size
@@ -63,7 +63,7 @@ def write_jason(data, filename):
         data (list or dict): data to write to file
         filename (str): path of the file to write to
     """
-    LOG.info("Writing data as json to {}".format(filename))
+    LOGGER.info("Writing data as json to {}".format(filename))
     with open(filename, 'w') as outfile:
         json.dump(data, outfile)
 
@@ -77,7 +77,7 @@ def yesterdays_range():
     yesterday = datetime.now() - timedelta(1)
     start = yesterday.replace(hour=0, minute=0, second=0, microsecond=0)
     end = start + timedelta(hours=23, minutes=59, seconds=59, milliseconds=999)
-    LOG.info("Yesterday's range start: {} end: {}".format(start, end))
+    LOGGER.info("Yesterday's range start: {} end: {}".format(start, end))
     return start, end
 
 def check_response(response):
@@ -90,14 +90,11 @@ def check_response(response):
     Raises
         Exception: If the status code is not 200
     """
-    # TODO: implement
-    if response.status_code == 200:
-        return
-    else:
-        LOG.error("Requests error code: {0}. Response:\n{1}".format(
-            response.status_code, response.text))
+    if response.status_code != 200:
+        LOGGER.error("Requests error code: %s. Response:\n%s",
+                     response.status_code, response.text)
         raise Exception("Non-200 status code returned")
-    return
+
 
 def parse_date(str_dt):
     """Convert a date string to a datetime object
@@ -110,13 +107,13 @@ def parse_date(str_dt):
     Returns:
         datetime.datetime: Datetime object
     """
-    LOG.info("Parsing '{}' into datetime object".format(str_dt))
+    LOGGER.info("Parsing '{}' into datetime object".format(str_dt))
     try:
         return dateutil.parser.parse(str_dt)
     except ValueError:
         raise
     except Exception:
-        LOG.error("Unable to parse str_dt due to error.")
+        LOGGER.error("Unable to parse str_dt due to error.")
         raise
 
 def convert_timezone(dt, tz1, tz2):
@@ -130,7 +127,7 @@ def convert_timezone(dt, tz1, tz2):
     Returns:
         datetime.datetime: Datetime object in timezone 2
     """
-    LOG.info("Converting '{}' from timezone: '{}' to timezone '{}'".format(
+    LOGGER.info("Converting '{}' from timezone: '{}' to timezone '{}'".format(
                 dt, tz1, tz2))
     timezones = pytz.all_timezones
     if tz1 not in timezones or tz2 not in timezones:
@@ -156,13 +153,13 @@ def read_yaml(yaml_file):
     """
 
     try:
-        LOG.debug("Reading in yaml file %s" % yaml_file)
+        LOGGER.debug("Reading in yaml file %s" % yaml_file)
         with open(yaml_file) as f:
             # use safe_load instead load
             data = yaml.safe_load(f)
         return data
     except Exception:
-        LOG.error('Unable to read file %s.' % (yaml_file))
+        LOGGER.error('Unable to read file %s.' % (yaml_file))
         raise
 
 def upload_to_s3(s3_bucket, files, encrypt=True):
@@ -174,7 +171,7 @@ def upload_to_s3(s3_bucket, files, encrypt=True):
         encrypt (:obj:`bool`, optional): Use serverside AES256 encryption,
             defaults to True.
     """
-    LOG.info("Attempting to load {0} files to s3 bucket: {1}".format(
+    LOGGER.info("Attempting to load {0} files to s3 bucket: {1}".format(
              len(files), s3_bucket))
     s3 = boto3.resource('s3')
     for f in files:
@@ -219,7 +216,7 @@ def read_s3_file(s3_bucket, key):
     Returns:
         str: Contents of S3 object
     """
-    LOG.info("Reading {0} from S3 bucket: {1}".format(key, s3_bucket))
+    LOGGER.info("Reading {0} from S3 bucket: {1}".format(key, s3_bucket))
     s3 = boto3.resource('s3')
     obj = s3.Object(s3_bucket, key)
     contents = obj.get()['Body'].read().decode('utf-8')
@@ -262,7 +259,7 @@ def search_path(path, like=None):
         list: list of files matching the specified filetypes
     """
     files = []
-    LOG.info('Searching for files in %s' % path)
+    LOGGER.info('Searching for files in %s' % path)
     for p in os.listdir(path):
         full_path = os.path.join(path, p)
 
@@ -275,7 +272,7 @@ def search_path(path, like=None):
                     files.append(full_path)
             else:
                 files.append(full_path)
-    LOG.info("Found %s files in %s", len(files), path)
+    LOGGER.info("Found %s files in %s", len(files), path)
     return files
 
 def clean_dir(path, prefix=None):
@@ -286,14 +283,14 @@ def clean_dir(path, prefix=None):
         prefix (:obj:`str`, optional): File prefix
     """
 
-    LOG.info("Cleaning folders in %s" % path)
+    LOGGER.info("Cleaning folders in %s" % path)
     for p in os.listdir(path):
         prefix_check = True
         fullPath = os.path.join(path, p)
         if os.path.isdir(fullPath):
             shutil.rmtree(fullPath)
             assert not os.path.isdir(fullPath)
-            log.debug("Successfully removed folder " + fullPath)
+            LOGGER.debug("Successfully removed folder " + fullPath)
         elif os.path.isfile(fullPath):
             basename = os.path.basename(fullPath)
             if prefix is not None:
@@ -301,5 +298,5 @@ def clean_dir(path, prefix=None):
             if prefix_check and basename.startswith('.') == False:
                 os.remove(fullPath)
                 assert not os.path.isfile(fullPath)
-                log.debug("Successfully removed file " + fullPath)
+                LOGGER.debug("Successfully removed file " + fullPath)
     return
