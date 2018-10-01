@@ -294,7 +294,7 @@ def parse_html(html):
 
 
 def clean_text(text):
-    """Function to sanitize the trnascript messages. Replaces all whitespace
+    """Function to sanitize the transcript messages. Replaces all whitespace
     with single spaces (since newlines break things when uploading to the DB).
     Get rid of everything that isn't a number, letter, or in a list of
     characters to keep.

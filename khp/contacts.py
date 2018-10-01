@@ -80,8 +80,10 @@ def download_transcripts(contact_ids=None):
     ice = Icescape()
     for chunked_contact_ids in utils.chunker(contact_ids, 20):
         transcripts = ice.get_recordings(chunked_contact_ids)
-        if len(transcripts) != len(chunked_contact_ids):
-            missing = list(set(chunked_contact_ids) - set(transcripts))
+        if len(transcripts) < len(chunked_contact_ids):
+            retrieved = [transcript['Value']['ContactID']
+                         for transcript in transcripts]
+            missing = list(set(chunked_contact_ids) - set(retrieved))
             LOGGER.warning('Missing transcripts %s', missing)
             raise Exception("Transcripts not returned for all contact ids")
         for contact_id, transcript in zip(chunked_contact_ids, transcripts):

@@ -5,7 +5,7 @@ import json
 from khp import config
 from khp import utils
 
-LOG = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 class Icescape():
     """Summary
@@ -28,7 +28,7 @@ class Icescape():
     def _get_access_token(self):
         base_url = self.conf['login_url']
         headers = self._build_login_headers()
-        LOG.info("Getting access token")
+        LOGGER.info("Getting access token")
         r = requests.post(base_url, data=json.dumps(self.password), headers=headers)
         utils.check_response(r)
         data = r.json()
@@ -75,7 +75,7 @@ class Icescape():
             dt2 = utils.parse_date(end_time)
         else:
             dt1, dt2 = utils.yesterdays_range()
-            LOG.info("Both start_time and end_time were not provided, "
+            LOGGER.info("Both start_time and end_time were not provided, "
                 "defaulting to start: {} end: {}".format(dt1, dt2))
 
         dt1 = utils.convert_timezone(dt1, tz1, tz2)
@@ -107,9 +107,9 @@ class Icescape():
             'includeAdditionalData': True
         }
         base_url = self.conf['contacts_url']
-        LOG.info("Requesting {} with params:\n{}".format(base_url, params))
+        LOGGER.info("Requesting {} with params:\n{}".format(base_url, params))
         r = requests.get(base_url, params=params, headers=self.headers)
-        LOG.debug("Requested: {}".format(r.url))
+        LOGGER.debug("Requested: {}".format(r.url))
         utils.check_response(r)
         data = r.json()
         return data
@@ -124,10 +124,16 @@ class Icescape():
         """
         base_url = self.conf['recordings_url']
         payload = ["C:{}".format(contact_id) for contact_id in contact_ids]
-        LOG.info("Requesting {} with payload: {}".format(base_url, payload))
+        LOGGER.info("Requesting {} with payload: {}".format(base_url, payload))
         r = requests.post(base_url, data=json.dumps(payload),
                             headers=self.headers)
         utils.check_response(r)
         data = r.json()
+        data = [dat for dat in data if 'IMMessages' in dat['Value'].keys()]
+        received = [dat['Value']['ContactID'] for dat in data]
+        missing = list(set(contact_ids) - set(received))
+        if missing:
+            LOGGER.warning('Missing transcripts %s', missing)
+            raise Exception("Transcripts not returned for all contact ids")
         return data
 
