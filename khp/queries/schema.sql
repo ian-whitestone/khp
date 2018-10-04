@@ -58,6 +58,7 @@ CREATE TABLE contacts (
   PRIMARY KEY (contact_id, interaction_type)
 )
 ;
+
 DROP TABLE IF EXISTS transcripts;
 CREATE TABLE transcripts (
   contact_id INTEGER,
@@ -68,6 +69,14 @@ CREATE TABLE transcripts (
   message TEXT
 )
 ;
+
+DROP TABLE IF EXISTS distress_scores;
+CREATE TABLE distress_scores (
+  contact_id INTEGER,
+  score INTEGER
+)
+;
+
 
 DROP TABLE IF EXISTS enhanced_transcripts;
 CREATE TABLE enhanced_transcripts (
