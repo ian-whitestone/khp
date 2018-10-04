@@ -2,8 +2,10 @@ import logging
 from datetime import timedelta, datetime
 import os
 
+from dask import delayed, compute
 import pandas as pd
 import postgrez
+
 from khp import utils
 from khp import config
 from khp.icescape import Icescape
@@ -156,6 +158,7 @@ def parse_transcript(filename):
     load_data = [[message[key] for key in columns]
                  for message in messages]
 
+    # Remove any | from the message strings, as the postgrez load from object method
     for i, row in enumerate(load_data):
         for j, record in enumerate(row):
             if isinstance(record, str):
@@ -276,14 +279,17 @@ def enhanced_transcripts():
     optimus = Transformer(transcripts_tforms)
     megatron = Transformer(transcripts_meta_tforms)
 
+    delayeds = []
     for contact_id in to_load:
         LOGGER.info('Processing transcript for contact_id %s', contact_id)
-        dataframe = load_transcripts_df([contact_id])
-        dataframe = optimus.run_df_transforms(dataframe)
-        summary = megatron.run_meta_df_transforms(dataframe)
-        summary = replace_nans(summary)
-        load_enhanced_transcript(contact_id, summary)
-    return
+        dataframe = delayed(load_transcripts_df)([contact_id])
+        dataframe = delayed(optimus.run_df_transforms)(dataframe)
+        summary = delayed(megatron.run_meta_df_transforms)(dataframe)
+        summary = delayed(replace_nans)(summary)
+        out = delayed(load_enhanced_transcript)(contact_id, summary)
+        delayeds.append(out)
+
+    compute(*delayeds)
 
 def main(interaction_type='IM', start_date=None, end_date=None):
     """Run the full contacts pipeline.
