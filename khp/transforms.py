@@ -181,12 +181,13 @@ def filter_df(dataframe, filters):
     Returns:
         pandas.DataFrame: Filtered dataframe
     """
+    fltr_df = dataframe.copy() 
     for fltr_dict in filters:
         fltr_fn = getattr(operator, fltr_dict['operator'])
         fltr_value = fltr_dict['value']
         fltr_value = getattr(builtins, fltr_dict['value_type'])(fltr_value)
         fltr_check = fltr_fn(dataframe[fltr_dict['column']], fltr_value)
-        fltr_df = dataframe[fltr_check]
+        fltr_df = fltr_df[fltr_check]
     return fltr_df
 
 def row_count(dataframe, parameters):

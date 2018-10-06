@@ -289,7 +289,7 @@ def enhanced_transcripts():
         out = delayed(load_enhanced_transcript)(contact_id, summary)
         delayeds.append(out)
 
-    compute(*delayeds)
+    compute(*delayeds, scheduler='threads', num_workers=20)
 
 def main(interaction_type='IM', start_date=None, end_date=None):
     """Run the full contacts pipeline.

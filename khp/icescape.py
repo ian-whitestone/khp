@@ -29,7 +29,8 @@ class Icescape():
         base_url = self.conf['login_url']
         headers = self._build_login_headers()
         LOGGER.info("Getting access token")
-        r = requests.post(base_url, data=json.dumps(self.password), headers=headers)
+        r = requests.post(
+            base_url, data=json.dumps(self.password), headers=headers)
         utils.check_response(r)
         data = r.json()
         token = data['AccessToken']
