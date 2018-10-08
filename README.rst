@@ -1,5 +1,5 @@
 =======================
-KHP
+KHP Data
 =======================
 
 
@@ -61,4 +61,4 @@ Icescape
 .. |coverage| image:: https://coveralls.io/repos/github/ian-whitestone/postgrez/badge.svg
     :target: https://coveralls.io/github/ian-whitestone/postgrez
 .. |license| image:: https://img.shields.io/badge/License-MIT-yellow.svg
-    :target: https://github.com/ian-whitestone/khp/blob/master/LICENSE
+    :target: https://github.com/ian-whitestone/khp-data/blob/master/LICENSE
