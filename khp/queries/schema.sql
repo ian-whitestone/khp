@@ -186,4 +186,5 @@ CREATE TABLE stat_cdr (
 ;
 
 
-
+CREATE INDEX agent_id_index ON stat_adr (agentid);
+CREATE INDEX contact_id_index ON stat_adr (contactid);
