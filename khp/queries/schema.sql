@@ -133,3 +133,57 @@ INSERT INTO queue_meta VALUES (6020, 'EN', 'MOBILE');
 INSERT INTO queue_meta VALUES (6007, 'EN', 'DESKTOP');
 INSERT INTO queue_meta VALUES (6021, 'FR', 'MOBILE');
 INSERT INTO queue_meta VALUES (6008, 'FR', 'DESKTOP');
+
+
+
+DROP TABLE IF EXISTS stat_adr;
+
+CREATE TABLE stat_adr (
+  PrimaryKey VARCHAR(200),
+  EventTime TIMESTAMP,
+  DSTStatus INTEGER,
+  SwitchID INTEGER,
+  AgentID INTEGER,
+  EventType INTEGER,
+  EventID INTEGER,
+  CurrentState INTEGER,
+  LastState INTEGER,
+  LastStateDuration INTEGER,
+  QueueID INTEGER,
+  ContactID INTEGER,
+  ContactType INTEGER,
+  RouteType INTEGER,
+  TargetID INTEGER,
+  Reason INTEGER,
+  DialledNumber BIGINT,
+  AssociatedQueueID INTEGER,
+  AgentCallType INTEGER,
+  EventSequence INTEGER
+)
+;
+
+
+DROP TABLE IF EXISTS stat_cdr;
+
+CREATE TABLE stat_cdr (
+  PrimaryKey VARCHAR(200),
+  EventTime TIMESTAMP,
+  DSTStatus INTEGER,
+  ContactID INTEGER,
+  EventID INTEGER,
+  SwitchID INTEGER,
+  ContactType INTEGER,
+  CurrentState INTEGER,
+  LastState INTEGER,
+  LastStateDuration INTEGER,
+  QueueID INTEGER,
+  IntData1 INTEGER,
+  IntData2 INTEGER,
+  IntData3 INTEGER,
+  IntData4 INTEGER,
+  EventSequence INTEGER
+)
+;
+
+
+
